@@ -4,6 +4,109 @@
   
     
     <entry>
+      <title>C++简介</title>
+      <link href="/2023/06/03/C-01/"/>
+      <url>/2023/06/03/C-01/</url>
+      
+        <content type="html"><![CDATA[<p>C++ (&#x2F;ˈsiː plʌs plʌs&#x2F;, pronounced “C plus plus”) is a high-level, general-purpose programming language created by Danish computer scientist Bjarne Stroustrup. First released in 1985 as an extension of the C programming language, it has since expanded significantly over time; modern C++ currently has object-oriented, generic, and functional features, in addition to facilities for low-level memory manipulation. It is almost always implemented as a compiled language, and many vendors provide C++ compilers, including the Free Software Foundation, LLVM, Microsoft, Intel, Embarcadero, Oracle, and IBM.</p><p>C++ was designed with systems programming and embedded, resource-constrained software and large systems in mind, with performance, efficiency, and flexibility of use as its design highlights. C++ has also been found useful in many other contexts, with key strengths being software infrastructure and resource-constrained applications, including desktop applications, video games, servers (e.g. e-commerce, web search, or databases), and performance-critical applications (e.g. telephone switches or space probes).</p><p>C++ is standardized by the International Organization for Standardization (ISO), with the latest standard version ratified and published by ISO in December 2020 as ISO&#x2F;IEC 14882:2020 (informally known as C++20). The C++ programming language was initially standardized in 1998 as ISO&#x2F;IEC 14882:1998, which was then amended by the C++03, C++11, C++14, and C++17 standards. The current C++20 standard supersedes these with new features and an enlarged standard library. Before the initial standardization in 1998, C++ was developed by Stroustrup at Bell Labs since 1979 as an extension of the C language; he wanted an efficient and flexible language similar to C that also provided high-level features for program organization. Since 2012, C++ has been on a three-year release schedule with C++23 as the next planned standard.</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> C++ </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>C语言简介</title>
+      <link href="/2023/06/03/C-01/"/>
+      <url>/2023/06/03/C-01/</url>
+      
+        <content type="html"><![CDATA[<p>The C Programming Language (sometimes termed K&amp;R, after its authors’ initials) is a computer programming book written by Brian Kernighan and Dennis Ritchie, the latter of whom originally designed and implemented the C programming language, as well as co-designed the Unix operating system with which development of the language was closely intertwined. The book was central to the development and popularization of C and is still widely read and used today. Because the book was co-authored by the original language designer, and because the first edition of the book served for many years as the de facto standard for the language, the book was regarded by many to be the authoritative reference on C.<br>C was created by Dennis Ritchie at Bell Labs in the early 1970s as an augmented version of Ken Thompson’s B.[3] Another Bell Labs employee, Brian Kernighan, had written the first C tutorial,[4] and he persuaded Ritchie to coauthor a book on the language.[5] Kernighan would write most of the book’s “expository” material, and Ritchie’s reference manual became its appendices.</p><p>The first edition, published February 22, 1978, was the first widely available book on the C programming language. Its version of C is sometimes termed K&amp;R C (after the book’s authors), often to distinguish this early version from the later version of C standardized as ANSI C.[6]</p><p>In April 1988, the second edition of the book was published, updated to cover the changes to the language resulting from the then-new ANSI C standard, particularly with the inclusion of reference material on standard libraries. The second edition of the book (and as of 2022, the most recent) has since been translated into over 20 languages.[7] In 2012, an eBook version of the second edition was published in ePub, Mobi, and PDF formats.[8]</p><p>ANSI C, first standardized in 1989 (as ANSI X3.159-1989), has since undergone several revisions, the most recent of which is ISO&#x2F;IEC 9899:2018 (also termed C17 or C18), adopted as an ANSI standard in June 2018. However, no new edition of The C Programming Language has been issued to cover the more recent standards.</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> C </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> C </tag>
+            
+            <tag> C-introduction </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Java简介</title>
+      <link href="/2023/06/03/Java-01/"/>
+      <url>/2023/06/03/Java-01/</url>
+      
+        <content type="html"><![CDATA[<p>Java is a high-level, class-based, object-oriented programming language that is designed to have as few implementation dependencies as possible. It is a general-purpose programming language intended to let programmers write once, run anywhere (WORA), meaning that compiled Java code can run on all platforms that support Java without the need to recompile. Java applications are typically compiled to bytecode that can run on any Java virtual machine (JVM) regardless of the underlying computer architecture. The syntax of Java is similar to C and C++, but has fewer low-level facilities than either of them. The Java runtime provides dynamic capabilities (such as reflection and runtime code modification) that are typically not available in traditional compiled languages. As of 2019, Java was one of the most popular programming languages in use according to GitHub,[citation not found] particularly for client–server web applications, with a reported 9 million developers.</p><p>Java was originally developed by James Gosling at Sun Microsystems. It was released in May 1995 as a core component of Sun Microsystems’ Java platform. The original and reference implementation Java compilers, virtual machines, and class libraries were originally released by Sun under proprietary licenses. As of May 2007, in compliance with the specifications of the Java Community Process, Sun had relicensed most of its Java technologies under the GPL-2.0-only license. Oracle offers its own HotSpot Java Virtual Machine, however the official reference implementation is the OpenJDK JVM which is free open-source software and used by most developers and is the default JVM for almost all Linux distributions.</p><p>As of March 2023, Java 20 is the latest version, while Java 17, 11 and 8 are the current long-term support (LTS) versions.</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> Java </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>计算机网络简介</title>
+      <link href="/2023/06/03/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-01/"/>
+      <url>/2023/06/03/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-01/</url>
+      
+        <content type="html"><![CDATA[<p>计算机网络（英语：computer network），通常也简称网络，是指容许节点分享资源的数字电信网络:1-3。在电脑网络，电脑设备会透过节点之间的连接（数据链路）互相交换数据，即收发（接收和发放）网络信息。传输介质可分为有线及无线两类——有线的可用到双绞线、光纤电缆等介质；无线则可用到Wi-Fi、NFC和Bluetooth等。</p><p>用于创建、路由及终止数据传输的电脑网络设备即为网络节点。节点包括像个人电脑、电话、服务器般的主机及其他网络硬件（如网关及路由器）。它们一般以网络地址作标识符。当一个设备能够与另一设备交换信息时，便可视它们俩已连接成网络，不论它们是否直连。专用通信协议在大多数分层中位于其他更通用的通信协议之上。要维持网络的可靠性，便需要有一定的网络管理技能。</p><p>电脑网络为海量应用程序及服务背后的基础。比如存取互联网、数字视频、数字音频；共享打印机；收发电子邮件及即时通信消息:4-p.21-29。电脑网络可依照传输介质、传输协议、 网络大小、拓扑、流量控制机制、创建目的等因素区分。世界上最大的电脑网络为互联网。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 计算机网络 </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>计算机组成原理简介</title>
+      <link href="/2023/06/03/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E5%8E%9F%E7%90%86-01/"/>
+      <url>/2023/06/03/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E5%8E%9F%E7%90%86-01/</url>
+      
+        <content type="html"><![CDATA[<p>计算机系统是当代生活中比较常见的复杂系统之一。随着科技的发展，计算机系统正变得愈加成熟。</p><p>究其本质，计算机系统由硬件和软件两大部分组成。硬件的工作依靠软件的控制，软件的运行依托硬件的支持。两者相互依存，不可分割。</p><p>硬件指的是计算机的实体部分，也就是“看得见，摸得着”的部分，由各类电子元器件以及光、电、机等相关设备组成，包括主机和外设等。</p><p>现在最常见的计算机系统，是1945年编制的冯·诺依曼计算机。我们日常所指的计算机，基本都是冯·诺依曼计算机。读本所介绍的，也是冯·诺依曼计算机。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 计算机组成原理 </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>第一篇文章</title>
       <link href="/2023/06/02/2023-6-2-firstpage/"/>
       <url>/2023/06/02/2023-6-2-firstpage/</url>
@@ -20,28 +123,6 @@
     
     
     <entry>
-      <title>关于</title>
-      <link href="/about/index.html"/>
-      <url>/about/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>电影</title>
-      <link href="/movies/index.html"/>
-      <url>/movies/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>照片墙</title>
       <link href="/Gallery/index.html"/>
       <url>/Gallery/index.html</url>
@@ -53,9 +134,53 @@
     
     
     <entry>
-      <title>友链</title>
-      <link href="/link/index.html"/>
-      <url>/link/index.html</url>
+      <title>关于</title>
+      <link href="/about/index.html"/>
+      <url>/about/index.html</url>
+      
+        <content type="html"><![CDATA[<!-- GitCalendar容器 --><div id="gitZone"></div>]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>categories</title>
+      <link href="/categories/index.html"/>
+      <url>/categories/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/css/custom.css"/>
+      <url>/css/custom.css</url>
+      
+        <content type="html"><![CDATA[/* 页脚与头图透明 */#footer {    background: transparent !important;}#page-header {    background: transparent !important;}/* 白天模式遮罩透明 */#footer::before {    background: transparent !important;}#page-header::before {    background: transparent !important;}/* 夜间模式遮罩透明 */[data-theme="dark"] #footer::before {    background: transparent !important;}[data-theme="dark"] #page-header::before {    background: transparent !important;}/* 小冰分类分类磁铁黑夜模式适配 *//* 一般状态 */[data-theme="dark"] .magnet_link_context {    background: #1e1e1e;    color: antiquewhite;}/* 鼠标悬浮状态 */[data-theme="dark"] .magnet_link_context:hover {    background: #3ecdf1;    color: #f2f2f2;}@font-face {    /* 为载入的字体取名字(随意) */    font-family: 'YS';    /* 字体文件地址(相对或者绝对路径都可以) */    /*        src: local("/font/优设好身体.woff2");        会出现红线报错情况。如果路径对。就不要管他        */    src: url(/font/优设好身体.woff2);    /* 定义加粗样式(加粗多少) */    font-weight: normal;    /* 定义字体样式(斜体/非斜体) */    font-style: normal;    /* 定义显示样式 */    font-display: block;}/* 翻页按钮居中 */#pagination {    width: 100%;    margin: auto;}]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/js/runtime.js"/>
+      <url>/js/runtime.js</url>
+      
+        <content type="html"><![CDATA[var now=new Date;function createtime(){now.setTime(now.getTime()+1e3);    var e=new Date("06/01/2023 00:00:00"),t=Math.trunc(234e8+(now-e)/1e3*17),a=(t/1496e5).toFixed(6),o=new Date("06/01/2023 00:00:00"),n=(now-o)/1e3/60/60/24,r=Math.floor(n),i=(now-o)/1e3/60/60-24*r,s=Math.floor(i);1==String(s).length&&(s="0"+s);    var d=(now-o)/1e3/60-1440*r-60*s,l=Math.floor(d);1==String(l).length&&(l="0"+l);    var g=(now-o)/1e3-86400*r-3600*s-60*l,b=Math.round(g);1==String(b).length&&(b="0"+b);    let c="";c=s<18&&s>=9?`<img class='boardsign' src='https://img.shields.io/badge/%E6%98%9F%E9%99%85%E7%89%9B%E4%BB%94-%E6%91%86%E7%83%82%E4%B8%AD-ff69b4' title='阿姆斯特朗闪光回旋炮!'><br> <div style="font-size:13px;font-weight:bold">小破站居然运行了 ${r} 天 ${s} 小时 ${l} 分 ${b} 秒 <i id="heartbeat" class='fas fa-heartbeat'></i> <br> 事物的历史由其本身写就，事物的诞生就开始了对自己历史的书写 🚀</div>`:`<img class='boardsign' src='https://img.shields.io/badge/%E6%98%9F%E9%99%85%E7%89%9B%E4%BB%94-%E4%B8%8D%E6%91%86%E7%83%82-brightgreen' title='阿姆斯特朗闪光回旋炮!'><br> <div style="font-size:13px;font-weight:bold">小破站居然运行了 ${r} 天 ${s} 小时 ${l} 分 ${b} 秒 <i id="heartbeat" class='fas fa-heartbeat'></i> <br> 事物的历史由其本身写就，事物的诞生就开始了对自己历史的书写 🚀</div>`,document.getElementById("workboard")&&(document.getElementById("workboard").innerHTML=c)}setInterval((()=>{createtime()}),1e3);]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>电影</title>
+      <link href="/movies/index.html"/>
+      <url>/movies/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -78,6 +203,17 @@
       <title>tags</title>
       <link href="/tags/index.html"/>
       <url>/tags/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>友链</title>
+      <link href="/link/index.html"/>
+      <url>/link/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
