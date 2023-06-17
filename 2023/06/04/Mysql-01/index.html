@@ -1,0 +1,746 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>mysql专项 | Ginkgovio-Blog</title><meta name="author" content="Ginkgovio"><meta name="copyright" content="Ginkgovio"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="mysql引擎区别以及分布式事务">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mysql专项">
+<meta property="og:url" content="https://github.com/2023/06/04/Mysql-01/index.html">
+<meta property="og:site_name" content="Ginkgovio-Blog">
+<meta property="og:description" content="mysql引擎区别以及分布式事务">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://github.com/img/lunbo-08.jpg">
+<meta property="article:published_time" content="2023-06-04T04:00:00.000Z">
+<meta property="article:modified_time" content="2023-06-04T04:00:00.000Z">
+<meta property="article:author" content="Ginkgovio">
+<meta property="article:tag" content="mysql">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://github.com/img/lunbo-08.jpg"><link rel="shortcut icon" href="/img/mbys.png"><link rel="canonical" href="https://github.com/2023/06/04/Mysql-01/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/node-snackbar/0.1.16/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.17/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":true,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: {"limitDay":366,"position":"top","messagePrev":"It has been","messageNext":"days since the last update, the content of the article may be outdated."},
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":230},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"top-right"},
+  source: {
+    justifiedGallery: {
+      js: 'https://cdnjs.cloudflare.com/ajax/libs/flickr-justified-gallery/2.1.2/fjGallery.min.js',
+      css: 'https://cdnjs.cloudflare.com/ajax/libs/flickr-justified-gallery/2.1.2/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isAnchor: true,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'mysql专项',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: true,
+  isToc: true,
+  postUpdate: '2023-06-04 12:00:00'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const now = new Date()
+          const hour = now.getHours()
+          const isNight = hour <= 6 || hour >= 18
+          if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+          else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/custom.css" media="defer" onload="this.media='all'"><link rel="stylesheet" href="https://cdn1.tianli0.top/npm/element-ui@2.15.6/packages/theme-chalk/lib/index.css"><!-- hexo injector head_end start --><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Zfour/Butterfly-double-row-display@1.00/cardlistpost.min.css"/>
+<style>#recent-posts > .recent-post-item >.recent-post-info > .article-meta-wrap > .tags:before {content:"\A";
+  white-space: pre;}#recent-posts > .recent-post-item >.recent-post-info > .article-meta-wrap > .tags > .article-meta__separator{display:none}</style>
+<link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-categories-card@1.0.0/lib/categorybar.css"><link rel="stylesheet" href="https://www.fomal.cc/static/css/runtime.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-swiper/lib/swiper.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-swiper/lib/swiperstyle.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-wowjs/lib/animate.min.css" media="print" onload="this.media='screen'"><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-tag-plugins-plus@latest/lib/assets/font-awesome-animation.min.css" media="defer" onload="this.media='all'"><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-tag-plugins-plus@latest/lib/tag_plugins.css" media="defer" onload="this.media='all'"><script src="https://npm.elemecdn.com/hexo-butterfly-tag-plugins-plus@latest/lib/assets/carousel-touch.js"></script><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-filter-gitcalendar/lib/gitcalendar.css" media="print" onload="this.media='all'"><!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><script>const preloader = {
+  endLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = 'hidden';
+    document.getElementById('loading-box').classList.remove("loaded")
+  }
+}
+
+preloader.initLoading()
+window.addEventListener('load',()=> { preloader.endLoading() })
+
+if (true) {
+  document.addEventListener('pjax:send', () => { preloader.initLoading() })
+  document.addEventListener('pjax:complete', () => { preloader.endLoading() })
+}</script><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/assets/gk-01.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">12</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">8</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group hide" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 休闲</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/bookshelf/"><i class="fa-fw fas fa-book"></i><span> 书架</span></a></li><li><a class="site-page child" href="/bangumis/"><i class="fa-fw fas fa-video"></i><span> 番剧</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片墙</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comments/"><i class="fa-fw fas fa-envelope-open"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/lunbo-08.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="Ginkgovio-Blog"><span class="site-name">Ginkgovio-Blog</span></a></span><div id="randomPost"><a class="site-page social-icon search" href="javascript:;" onclick="randomPost()" title="随机访问一篇文章"><i class="fas fa-circle-notch fa-fw"></i></a></div><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><!--span=' '+_p('search.title')--></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group hide" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 休闲</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/bookshelf/"><i class="fa-fw fas fa-book"></i><span> 书架</span></a></li><li><a class="site-page child" href="/bangumis/"><i class="fa-fw fas fa-video"></i><span> 番剧</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片墙</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comments/"><i class="fa-fw fas fa-envelope-open"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">mysql专项</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-06-04T04:00:00.000Z" title="发表于 2023-06-04 12:00:00">2023-06-04</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-06-04T04:00:00.000Z" title="更新于 2023-06-04 12:00:00">2023-06-04</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/myql/">myql</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">2.6k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>8分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="mysql专项"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><div class="note default simple"><p>mysql底层知识专项</p>
+</div>
+<div class="timeline blue"><div class='timeline-item headline'><div class='timeline-item-title'><div class='item-circle'><p>时间轴</p>
+</div></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2023-06-04 [ 1.0 ]</p>
+</div></div><div class='timeline-item-content'><p>首次发布</p>
+</div></div></div>
+<h1 id="存储引擎区别"><a href="#存储引擎区别" class="headerlink" title="存储引擎区别"></a>存储引擎区别</h1><span class='p blue'>MyISAM:</span>
+<ul>
+<li>表锁（并发弱）</li>
+<li>不支持事务 — 无法保证关联的增删改操作安全</li>
+<li>不支持外键约束</li>
+</ul>
+<span class='p blue'>InnoDB：</span>
+<ul>
+<li>表锁/行锁 — 支持行锁，并发强</li>
+<li>支持事务 — 可以保证关联的增删改操作安全</li>
+<li>支持外键约束</li>
+</ul>
+<blockquote>
+<p>在查询时，事务检查和外键约束检查会带来额外开销，所以查询操作InnoDB的效率会收到影响。</p>
+</blockquote>
+<span class='p blue'>选择：</span>
+<ul>
+<li>一个表只做查询操作，选择MyISAM；如果这个表涉及到增删改操作，选择InnoDB</li>
+<li>在我们的实际业务中基本没有表只做查询，所以对于引擎，基本就是选择默认的InnoDB</li>
+<li>对于mysql服务系统的一些表，不提供增删改操作的话，会选择使用MyISAM}</li>
+</ul>
+<hr>
+<h1 id="InnoDB索引"><a href="#InnoDB索引" class="headerlink" title="InnoDB索引"></a>InnoDB索引</h1><blockquote>
+<p>索引是一种数据结构（通过某种方式，将数据组织在一起），在mysql数据库中默认选择的是B+Tree数据结构，通过索引可以提高查询数据的效率.</p>
+</blockquote>
+<h2 id="索引结构"><a href="#索引结构" class="headerlink" title="索引结构"></a>索引结构</h2><h3 id="B-Tree结构"><a href="#B-Tree结构" class="headerlink" title="B-Tree结构"></a>B-Tree结构</h3><p>每个节点中包含索引列的值和整行行数据</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/mysql-img/1665138506429.png" style="zoom:90%;" /></p>
+<h3 id="B-Tree结构-1"><a href="#B-Tree结构-1" class="headerlink" title="B+Tree结构"></a>B+Tree结构</h3><p>所有非叶子节点中只包含索引列的值，叶子节点中包含索引列的值和其他数据值，并且叶子节点之间使用实现双向关联。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/mysql-img/1665138615982.png" style="zoom:90%;" /></p>
+<blockquote>
+<p>MySQL默认节点大小是16kb，采用B+Tree结构进行索引数据存储时，每个非叶子节点可以存储更多的索引列信息，那么对于相同数据量的表而言，采用B+Tree实现索引比采用B-Tree实现索引可以拥有更少的层级，在进行索引查询时，查找目标数据的io次数就相对更少一些。</p>
+<p>另外B+Tree的叶子节点之间采用双向链表实现关联，可以非常方便实现范围查询。</p>
+</blockquote>
+<div class="note info flat"><p>b+tree索引，如果id列使用int类型的整数表示的话，三层索引结构能表示多少数据？？？<br>1亿数据量基本3层结构就可以表示了。 </p>
+</div>
+<h2 id="索引分类"><a href="#索引分类" class="headerlink" title="索引分类"></a>索引分类</h2><h3 id="聚簇索引"><a href="#聚簇索引" class="headerlink" title="聚簇索引"></a>聚簇索引</h3><p>聚簇索引:mysql所有数据的存储是直接存储在聚簇索引树上的,所以mysql说索引即数据,数据即索引。mysql数据库通过以下原则,保证一定会构建聚簇索引:</p>
+<ul>
+<li>通过表的主键,构建聚簇索引</li>
+<li>如果表没有主键,会选择一列唯一约束的的列,构建聚簇索引</li>
+<li>如果既没有主键,又没有唯一约束的列,会通过表中默认生成db_row_id列构建聚簇索引</li>
+</ul>
+<h3 id="二级索引"><a href="#二级索引" class="headerlink" title="二级索引"></a>二级索引</h3><p>二级索引(辅助索引):这个索引树上只保存索引列的值和聚簇索引列的值,当我们查询数据时,如果通过这个树找不到我们需要的全部列,会通过聚簇索引列的值到聚簇索引上找,这个动作我们称之为”回表”</p>
+<ul>
+<li><span class='p blue'>普通索引</span></li>
+<li><span class='p blue'>联合索引</span></li>
+<li>唯一索引</li>
+<li>外键索引</li>
+<li>全文索引</li>
+</ul>
+<blockquote>
+<p>聚簇索引和非聚簇索引关系</p>
+</blockquote>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/mysql-img/1665139009676.png" style="zoom:90%;" /></p>
+<h2 id="索引操作"><a href="#索引操作" class="headerlink" title="索引操作"></a>索引操作</h2><p>创建索引:</p>
+<ul>
+<li>create index 索引名 on 表名(列名1,列名2,…);</li>
+<li>alter table 表名 add index 索引名(列名1,列名2,…);</li>
+</ul>
+<p>查看索引:</p>
+<ul>
+<li>show index from 表名;</li>
+</ul>
+<p>删除索引:</p>
+<ul>
+<li>drop index 索引名 on 表名;</li>
+</ul>
+<h2 id="索引创建原则"><a href="#索引创建原则" class="headerlink" title="索引创建原则"></a>索引创建原则</h2><p>索引的创建原则：</p>
+<ul>
+<li><span class='p red'>索引的创建不是一劳永逸，需要根据后期的查询需求，做对应的取舍</span>
+<p>  ① 一张表的索引个数不允许过多，不允许超过5个</p>
+<pre><code>第一，每一个索引都是一个B+Tree的结构，需要占用数据库的存储空间，索引过多，会给存储带来压力
+第二，数据在索引树上是有序的，我们对表中记录进行增删改后，需要维护每个树的数据顺序，如果树过多，会造成增删改效率降低
+</code></pre><p>  ② 根据查询条件，基于最左匹配原则，创建索引;最左匹配原则是适用于所有索引的，不仅限于联合索引</p>
+<pre><code>数据在索引上是有顺序的，假设基于name和age构建一个联合索引 
+  数据是：zs-18 , zz-25, za-60
+  这些数据在索引树上的顺序是：za-60,zs-18,zz-25
+
+  select * from student where name=&#39;xx&#39;;  -- 可以使用索引
+  select * from student where age=18;     -- 不可以使用索引
+  select * from student where age=18 and name=&#39;xx&#39;; -- 可以使用索引
+  select * from student where age=18 or name=&#39;xx&#39;  -- 不可以使用索引
+  select * from student where name like &#39;xx%&#39;     -- 可以使用索引
+  select * from student where name like &#39;%xx%&#39;    -- 不可以使用索引
+</code></pre><p>  ③ 索引列的值占据的空间要尽可能小，mysql每次加载一页（16kb）能包含的行记录信息会更多，我们可以通过更少的io操作来查询到我们想要的数据。实际开发中，如果就是需要按照某一列来构建索引，但是这一列的值又很大，此时我们可以利用这一列的前几个字符来构建索引 — “前缀索引”，这个前缀到底要取多少个字符，需要进行计算的。</p>
+<pre><code>  SELECT COUNT(DISTINCT SUBSTRING(NAME,1,8))/COUNT(1) FROM product; -- 这个计算出来的值最起码大于90%
+  CREATE INDEX idx_name ON product(NAME(8)); -- 基于name列的前8个字符，创建前缀索引
+</code></pre><p>  ④ 尽可能减少回表操作，可以将需要查询的列结合查询条件，一并构建联合索引，这种操作称之为“覆盖索引”</p>
+<pre><code>  CREATE INDEX idx_name ON product(NAME(8));
+  SELECT id,NAME,price FROM product WHERE NAME=&#39;BfUifcYGBE&#39;; -- 要查询price，需要回表
+
+  CREATE INDEX idx_name_price ON product(NAME(8),price);
+  SELECT id,NAME,price FROM product WHERE NAME=&#39;BfUifcYGBE&#39;; -- 查询的price就在索引树上，不需要回表
+</code></pre><p>  ⑤ where与order by冲突时优先where</p>
+<blockquote>
+<p>在where和order by出现索引设计冲突时，到底是针对where去设计索引，还是针对order by设计索引？到底是让where去用上索引，还是让order by用上索引?<br>  一般这种时候往往都是让where条件去使用索引来快速筛选出来一部分指定的数据，接着再进行排序。因为大多数情况基于索引进行where筛选往往可以最快速度筛选出你要的少部分数据，然后做排序的成本可能会小很多。</p>
+</blockquote>
+</li>
+</ul>
+<h2 id="索引失效常见情况"><a href="#索引失效常见情况" class="headerlink" title="索引失效常见情况"></a>索引失效常见情况</h2><pre><code>1、不要在索引列上做任何操作（计算、函数、自动/手动类型转换），会导致索引失效而全表扫描
+2、mysql使用不等于、not in、not exists的时候无法使用索引会导致全表扫描
+3、is null、is not null一般情况下也无法使用索引
+4、联合索引第一个字段就用范围查找不会走索引，mysql内部可能觉得第一个字段就用范围，结果集应该很大，回表效率不高，还不如直接全表扫描
+5、in和or在表数据比较大的情况下会走索引，表数据不多的情况下会选择全表扫描
+6、字符串不加单引号，导致索引失效
+</code></pre><h2 id="相关概念"><a href="#相关概念" class="headerlink" title="相关概念"></a>相关概念</h2><h3 id="索引下推"><a href="#索引下推" class="headerlink" title="索引下推"></a>索引下推</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN SELECT * FROM employees_copy WHERE name like &#x27;LiLei%&#x27; AND age = 22 AND position =&#x27;manager&#x27;;</span><br><span class="line">MySQL5.6之前，这条语句先使用联合索引中name前缀查找符合数据，然后回表得到数据后，在比对age和position，过滤掉无效数据</span><br><span class="line">MySQL5.6开始，引入了索引下推优化，可以在索引遍历过程中，对索引中包含的所有字段先做判断，过滤掉不符合条件的记录之后再回表，可以有效减少回表次数（对于innodb引擎索引下推只能用于二级索引）</span><br><span class="line">****索引下推也不是必然的，如果查找到的数据量非常大，可能也不会走索引下推，比如范围查找。</span><br></pre></td></tr></table></figure>
+<h3 id="filesort文件排序"><a href="#filesort文件排序" class="headerlink" title="filesort文件排序"></a>filesort文件排序</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">单路排序：一次性取出所有满足条件的字段，然后在sort buffer中进行排序</span><br><span class="line">双路排序：也叫回表排序，首先根据相应的条件取出相应的排序字段和可以直接定位行数据的ID，然后在sort buffer中进行排序，排序完成后需要再次取回其他需要的字段。</span><br><span class="line">MySQL通过比较系统变量max_length_for_sort_data(默认1024字节)的大小和需要查询的字段总大小来判断使用哪种排序模式：</span><br><span class="line">     查询某一行字段的总大小小于mlfsd，使用单路排序</span><br><span class="line">     查询某一行字段的总大小大于mlfsd，使用双路排序</span><br><span class="line">     ***可以调整mlfsd的大小，控制使用单路排序或者双路排序，但是慎重使用</span><br></pre></td></tr></table></figure>
+<h2 id="索引设计实战"><a href="#索引设计实战" class="headerlink" title="索引设计实战"></a>索引设计实战</h2><p>以社交场景APP来举例，我们一般会去搜索一些好友，这里面就涉及到对用户信息的筛选，这里肯定就是对用户user表搜索了，这个表一般来说数据量会比较大，我们先不考虑分库分表的情况，比如，我们一般会筛选地区(省市)，性别，年龄，身高，爱好之类的，有的APP可能用户还有评分，比如用户的受欢迎程度评分，我们可能还会根据评分来排序等等。</p>
+<p>对于后台程序来说除了过滤用户的各种条件，还需要分页之类的处理，可能会生成类似sql语句执行：</p>
+<ul>
+<li>select xx from user where xx=xx and xx=xx order by xx limit xx,xx</li>
+</ul>
+<p>对于这种情况如何合理设计索引了，比如用户可能经常会根据省市优先筛选同城的用户，还有根据性别去筛选，那我们是否应该设计一个联合索引 (province,city,sex) ？这些字段好像基数都不大，其实是应该的，因为这些字段查询太频繁了。假设又有用户根据年龄范围去筛选了，比如<span class='p green'>where province=xx and city=xx and age>=xx and age<=xx</span>，我们尝试着把age字段加入联合索引 (province,city,sex,age)，<strong>注意，一般这种范围查找的条件都要放在最后</strong>，之前讲过联合索引范围之后条件的是不能用索引的，但是对于当前这种情况依然用不到age这个索引字段，因为用户没有筛选sex字段，那怎么优化了？ </p>
+<p>其实我们可以这么来优化下sql的写法：<span class='p blue'>where province=xx and city=xx and sex in (female</span>。对于爱好之类的字段也可以类似sex字段处理，所以可以把爱好字段也加入索引(province,city,sex,hobby,age)</p>
+<p>假设可能还有一个筛选条件，比如要筛选最近一周登录过的用户，一般大家肯定希望跟活跃用户交友了，这样能尽快收到反馈，对应后台sql可能是这样：</p>
+<ul>
+<li>where province=xx and city=xx and sex in (‘female’,’male’) and age&gt;=xx and age&lt;=xx and latest_login_time&gt;= xx。</li>
+</ul>
+<p>那我们是否能把 latest_login_time 字段也加入索引了？比如(province,city,sex,hobby,age,latest_login_time) ，显然是不行的，那怎么来优化这种情况了？其实我们可以试着再设计一个字段is_login_in_latest_7_days，用户如果一周内有登录值就为1，否则为0，那么我们就可以把索引设计成 (province,city,sex,hobby,is_login_in_latest_7_days,age) 来满足上面那种场景了！</p>
+<p>一般来说，通过这么一个多字段的索引是能够过滤掉绝大部分数据的，就保留小部分数据下来基于磁盘文件进行order by语句的排序，最后基于limit进行分页，那么一般性能还是比较高的。</p>
+<p>不过有时可能用户会这么来查询，就查下受欢迎度较高的女性，比如sql：where sex = ‘female’ order by score limit xx,xx，那么上面那个索引是很难用上的，不能把太多的字段以及太多的值都用in语句拼接到sql里的，那怎么办了？其实我们可以再设计一个辅助的联合索引，比如 (sex,score)，这样就能满足查询要求了。</p>
+<blockquote>
+<p>以上就是给大家讲的一些索引设计的思路了，<strong>核心思想就是，尽量利用一两个复杂的多字段联合索引，抗下</strong><br><strong>你80%以上的查询，然后用一两个辅助索引尽量抗下剩余的一些非典型查询，保证这种大数据量表的查询尽</strong><br><strong>可能多的都能充分利用索引，这样就能保证你的查询速度和性能了！</strong></p>
+</blockquote>
+<h1 id="执行计划-explain"><a href="#执行计划-explain" class="headerlink" title="执行计划-explain"></a>执行计划-explain</h1><h2 id="id列"><a href="#id列" class="headerlink" title="id列"></a>id列</h2><p>select的序列号，有几个select就有几个id；id越大执行优先级越高，id相同则从上往下执行，id为NULL最后执行。</p>
+<h2 id="select-type列"><a href="#select-type列" class="headerlink" title="select_type列"></a>select_type列</h2><p>表示对应行是简单还是复杂查询</p>
+<ul>
+<li>simple-简单查询，不包含子查询和union查询</li>
+<li>primary-复杂查询中最外层的select</li>
+<li>subquery-包含在select中的子查询（不在from子句中）</li>
+<li>derived-包含在from子句中的子查询。mysql会将结果存放在一个临时表中，也称为派生表（derived的含义）</li>
+<li>union-在union中的第二个和随后的select</li>
+</ul>
+<h2 id="table列"><a href="#table列" class="headerlink" title="table列"></a>table列</h2><p>表示explain的一行正在访问哪个表</p>
+<h2 id="type列"><a href="#type列" class="headerlink" title="type列"></a>type列</h2><p>表示关联类型或访问类型，即mysql决定如何查找表中的行，查找数据记录的大概范围。<br>依次优到差为：system&gt;const&gt;eq_ref&gt;ref&gt;range&gt;index&gt;ALL,一般来说，得保证查询达到range级别，最好达到ref级别</p>
+<ul>
+<li><strong>NULL</strong>-mysql能够在优化阶段分解查询语句，在执行阶段用不着再访问表或索引。比如：在索引中选取最小值，可以单独查询索引来完成，不需要在执行时访问表</li>
+<li><strong>const，system</strong>-mysql能对查询的某部分进行优化并将其转化为一个常量。用于primary key或者unique key的所有列和常数比较时，所以表最多有一个匹配行，读取1次，速度比较快。system是const的特里，表示只有一条元组匹配时为system（表里只有一条数据）</li>
+<li><strong>eq_ref</strong>:primary key或unique key索引的所有部分被连接使用，最多只会返回一条符合条件的记录。这可能是在const之外最好的连接类型了，简单的select查询不会出现这种type</li>
+<li><strong>ref</strong>：相比eq_ref，不使用唯一索引，而是使用普通索引或者唯一索引的部分前缀，索引要和某个值比较，可能会找到多个符合条件的行</li>
+<li><strong>range</strong>：范围扫描通常出现在in(),between,&gt;,&gt;,&gt;=等操作中，使用一个索引来检索给定范围的行</li>
+<li><strong>index</strong>：扫描全索引就能拿到结果，一般是扫描某个二级索引，这种扫描不会从索引树根节点开始快速查找，而是直接对二级索引的叶子节点遍历和扫描，速度还是比较慢的，这种查询一般为使用覆盖索引，二级索引一般比较小，所以这种通常比ALL快一点。</li>
+<li><strong>ALL</strong>：全表扫描，扫描你的聚簇索引的所有叶子节点。通常情况下这需要增加索引来进行优化</li>
+</ul>
+<h2 id="possible-keys列"><a href="#possible-keys列" class="headerlink" title="possible_keys列"></a>possible_keys列</h2><p>查询可能使用哪些索引</p>
+<h2 id="key列"><a href="#key列" class="headerlink" title="key列"></a>key列</h2><p>查询实际使用哪个索引</p>
+<h2 id="key-len列"><a href="#key-len列" class="headerlink" title="key_len列"></a>key_len列</h2><p>显示mysql在索引中使用的字节数，通过这个值可以算出具体使用了索引中那些列</p>
+<h2 id="ref列"><a href="#ref列" class="headerlink" title="ref列"></a>ref列</h2><p>在key列记录的索引中，表查找值所用到的列或者常量，常见的有：const-常量，字段名（如film.id）</p>
+<h2 id="rows列"><a href="#rows列" class="headerlink" title="rows列"></a>rows列</h2><p>mysql要读取并检测的行数，不是结果集的行数</p>
+<h2 id="Extra列"><a href="#Extra列" class="headerlink" title="Extra列"></a>Extra列</h2><p>这一列展示额外信息</p>
+<ul>
+<li><strong>Using index</strong>-使用覆盖索引</li>
+<li><strong>Using where</strong>-使用where语句来处理结果，查询的列未被索引覆盖</li>
+<li><strong>Using index condition</strong>-查询的列不完全被索引覆盖，where条件中是一个前导列的范围</li>
+<li><strong>Using temporary</strong>-创建一张临时表来处理查询，出现这种情况一般是要进行优化的，首先要想到用索引来优化</li>
+<li><strong>Using filesort</strong>-用外部排序而不是索引排序，数据较小时从内存排序，否则需要在磁盘完成排序。这种情况下一般也是要考虑使用索引来优化的。</li>
+<li><strong>Select tables optimized away</strong>-使用某些聚合函数（如max、min）来访问存在索引的某个字段时</li>
+</ul>
+<blockquote>
+<p><strong>重点关注 type（system|consts|eq_ref|ref|range|index|All）、key_len、extra(index|where|index condition|temporary|filesort|select tables optimized away)</strong></p>
+</blockquote>
+<h1 id="数据类型选择"><a href="#数据类型选择" class="headerlink" title="数据类型选择"></a>数据类型选择</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">数值类型</span><br><span class="line">      1. 如果整形数据没有负数，如ID号，建议指定为UNSIGNED无符号类型，容量可以扩大一倍。</span><br><span class="line">      2. 建议使用TINYINT代替ENUM、BITENUM、SET。</span><br><span class="line">      3. 避免使用整数的显示宽度(参看文档最后)，也就是说，不要用INT(10)类似的方法指定字段显示宽度，直接用INT。在使用zerofull时，会在显示的时候，根据显示宽度在前面补0显示</span><br><span class="line">      4. DECIMAL最适合保存准确度要求高，而且用于计算的数据，比如价格。但是在使用DECIMAL类型的时候，注意长度设置。</span><br><span class="line">      5. 建议使用整形类型来运算和存储实数，方法是，实数乘以相应的倍数后再操作。</span><br><span class="line">      6. 整数通常是最佳的数据类型，因为它速度快，并且能使用AUTO_INCREMENT。</span><br><span class="line">日期类型</span><br><span class="line">      1. MySQL能存储的最小时间粒度为秒。</span><br><span class="line">      2. 建议用DATE数据类型来保存日期。MySQL中默认的日期格式是yyyy-mm-dd。</span><br><span class="line">      3. 用MySQL的内建类型DATE、TIME、DATETIME来存储时间，而不是使用字符串。</span><br><span class="line">      4. 当数据格式为TIMESTAMP和DATETIME时，可以用CURRENT_TIMESTAMP作为默认（MySQL5.6以后），MySQL会自动返回记录插入的确切时间。</span><br><span class="line">      5. TIMESTAMP是UTC时间戳，与时区相关。</span><br><span class="line">      6. DATETIME的存储格式是一个YYYYMMDD HH:MM:SS的整数，与时区无关，你存了什么，读出来就是什么。</span><br><span class="line">      7. 除非有特殊需求，一般的公司建议使用TIMESTAMP，它比DATETIME更节约空间，但是像阿里这样的公司一般会用DATETIME，因为不用考虑TIMESTAMP将来的时间上限问题。</span><br><span class="line">      8. 有时人们把Unix的时间戳保存为整数值，但是这通常没有任何好处，这种格式处理起来不太方便，我们并不推荐它。</span><br><span class="line">字符类型</span><br><span class="line">      1. 字符串的长度相差较大用VARCHAR；字符串短，且所有值都接近一个长度用CHAR。</span><br><span class="line">      2. CHAR和VARCHAR适用于包括人名、邮政编码、电话号码和不超过255个字符长度的任意字母数字组合。那些要用来计算的数字不要用VARCHAR类型保存，因为可能会导致一些与计算相关的问题。换句话说，可能影响到计算的准确性和完整性。</span><br><span class="line">      3. 尽量少用BLOB和TEXT，如果实在要用可以考虑将BLOB和TEXT字段单独存一张表，用id关联。</span><br><span class="line">      4. BLOB系列存储二进制字符串，与字符集无关。TEXT系列存储非二进制字符串，与字符集相关。</span><br><span class="line">      5. BLOB和TEXT都不能有默认值。</span><br></pre></td></tr></table></figure>
+<h1 id=""><a href="#" class="headerlink" title=""></a><span class='p red'>事务隔离级别原理之MVCC</span></h1><blockquote>
+<p>事务隔离级别：读未提交、读已提交(RC-ORACLE)、可重复读(RR - MYSQL)、串行化</p>
+<ul>
+<li><p>读已提交(RC-ORACLE): 在同一个事务中，能够读取到其他事务提交数据，同一个事务前后读取到的数据可能不一样</p>
+</li>
+<li><p>可重复读(RR - MYSQL):在同一个事务中，前后读取到的数据一样的。</p>
+</li>
+</ul>
+<p>在读已提交和可重复读这两个隔离级别下，隔离性就是靠MVCC(Multi-Version Concurrency Control)机制来保证的，对一行数据的读和写两个操作默认是不会通过加锁互斥来保证隔离性，避免了频繁加锁互斥，而在串行化隔离级别为了保证较高的隔离性是通过将所有操作加锁互斥来实现的。</p>
+</blockquote>
+<h2 id="默认字段"><a href="#默认字段" class="headerlink" title="默认字段"></a>默认字段</h2><pre><code>innoDB存储的最基本row中包含一些额外的存储信：DATA_TRX_ID、DATA_ROLL_PTR、DB_ROW_ID、DELETE BIT。
+    DATA_TRX_ID标记了最新更新这条行记录的transaction id，每处理一个事务，其值自动+1
+    DATA_ROLL_PTR 指向当前记录项的rollback segment的undo log记录，找之前版本的数据就是通过这个指针
+    DB_ROW_ID，当由innodb自动产生聚集索引时，聚集索引包括这个DB_ROW_ID的值，否则聚集索引中不包括这个值，这个用于索引当中
+    DELETE BIT位用于标识该记录是否被删除，这里的不是真正的删除数据，而是标志出来的删除，真正意义的删除是在commit的时候。
+</code></pre><h2 id="ReadView"><a href="#ReadView" class="headerlink" title="ReadView"></a>ReadView</h2><p>事务在开启事务后，执行第一个select操作是，会生成read view（读视图，RR只在第一次select生成，RC在每次select时生成）。读视图中记录当前正在活跃的事务id列表、最小活跃事务id、下一个还未开启的事务id。在执行查询时，遍历undo log日志链，比对undo log中事务id和read view中的事务id，决定这条记录是否对于本次查询可见，如果不可见，会沿着undo log日志链继续判断下一个事务id，找到可见即止。</p>
+<ul>
+<li>① 判断undo log中事务id&lt;read view中最小活跃id；如果满足，说明在当次查询之前，对应事务已经提交，可见；如果不满足，进行②</li>
+<li>② 判断undo log中事务id&gt;=read view中还未开启的下一个事务id，如果满足，说明事务是在当次查询之后开启，不可见；如果不满足进行③</li>
+<li>③ 判断undo log中事务id是否在活跃事务id列表中，如果在，并且不是当前事务，说明事务还未提交，不可见。如果不在，说明事务已经提交，可见（针对读已提交而言）。</li>
+</ul>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/mysql-img/1665387282652.png" style="zoom:90%;" /></p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/mysql-img/1665141071465.png" style="zoom:90%;" /></p>
+<h1 id="MySQL之BufferPool"><a href="#MySQL之BufferPool" class="headerlink" title="MySQL之BufferPool"></a>MySQL之BufferPool</h1><blockquote>
+<p>基于局部性原则，以页为单位将磁盘中的数据预加载到缓冲池中，提升后期数据访问的效率。缓冲池有大小限制，内部采用LRU算法进行数据淘汰。</p>
+</blockquote>
+<p><strong>预读失效</strong>：数据被加载进内存，但是从来没有使用过，返回由于lru算法，会将真正的热数据提前淘汰掉</p>
+<ul>
+<li>将整个缓冲池划分为头尾相连的新生代和老生代区间，数据预加载进buffer pool时，先进入老生代，如果后续有读取到对应页的数据，才会将其挪动到新生代</li>
+</ul>
+<p><strong>缓冲池污染：</strong>当某一个sql语句要扫描大量数据时，导致大量数据从老生代挪动到新生代，而淘汰很多数据，但是这些被大量扫描的数据只是用了一次，就不再使用</p>
+<ul>
+<li>加入到老生代的数据，如果被访问，不会立即挪动到新生代，而是会在老生代停留一些时间，如果再次被访问，才会挪动到新生代</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">相关参数：</span><br><span class="line">    innodb_buffer_pool_size 缓冲池大小 默认是134217728byte = 128M</span><br><span class="line">    innodb_old_blocks_pct  老生代占缓冲池大小的比例 默认是37%</span><br><span class="line">    innodb_old_blocks_time 数据在老生代停留时间 默认是1000ms</span><br></pre></td></tr></table></figure>
+<h1 id="mysql之binlog-amp-redolog-amp-undolog"><a href="#mysql之binlog-amp-redolog-amp-undolog" class="headerlink" title="mysql之binlog&amp;redolog&amp;undolog"></a>mysql之binlog&amp;redolog&amp;undolog</h1><blockquote>
+<p>逻辑日志：可以简单理解为记录的就是sql语句<br>物理日志：因为mysql数据最终是保存在数据页中的，物理日志记录的就是数据页变更</p>
+</blockquote>
+<ul>
+<li><strong>binlog：</strong>记录数据库执行的写入行操作（不包括查询）信息，以二进制的形式保存到磁盘中。binlo是mysql的逻辑日志，并且由server层进行记录，使用任何存储引擎，都会记录binlog日志。（主从复制、数据恢复）。只有事务提交时，才会记录binlog。事务未提交时，数据在内存中，何时提交，可以配置（操作系统决定、每commit、N个事务结束后）</li>
+<li><strong>redolog：</strong>记录事务对数据页做了哪些修改（保证持久性，事务提交，数据就会持久化，即使mysql宕机，数据依然不会丢失）。这个<strong>文件采用顺序写入，有固定大小，会循环覆盖</strong>。主要解决：</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">①innodb以页为单位进行磁盘交互，一个事务可能只修改几个字节，如果整个页刷新到磁盘，浪费资源，影响效率</span><br><span class="line">②一个事务可能修改多个页，这些页在物理上不是连续的，使用随机io写入性能很差</span><br><span class="line"></span><br><span class="line">*** 所有的写操作都是直接操作Buffer Pool中数据，同时将操作记录到redolog中，另外基于异步线程的方式将Buffer Pool中的数据修改更新到磁盘文件中，如果数据库宕机，磁盘文件更新还没来得及完成，会通过redolog进行数据恢复。</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><strong>redo log包括两部分：</strong>一个是内存中的日志缓冲(redo log buffer)，另一个是磁盘上的日志文件(redo log file)。mysql每执行一条DML语句，先将记录写入redo log buffer，后续某个时间点再一次性将多个操作记录写到redo log file。这种先写日志，再写磁盘的技术就是MySQL里经常说到的<strong>WAL</strong>(Write-Ahead Logging) 技术。</p>
+<p>内存缓存数据到磁盘文件过程：log buffer—》os buffer—》log file</p>
+</blockquote>
+<ul>
+<li><strong>undolog：</strong>回滚日志，保证原子性操作，同时也是MVCC实现的关键<blockquote>
+<p>insert对应一条delete操作<br>update对应一条反向的update操作<br>delete对应一个delete标记</p>
+</blockquote>
+</li>
+</ul>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/mysql-img/1665144202896.png" style="zoom:90%;" /></p>
+<h1 id="分布式事务"><a href="#分布式事务" class="headerlink" title="分布式事务"></a>分布式事务</h1><p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/mysql-img/1665453064648.png" style="zoom:90%;" /></p>
+<h2 id="常见方案"><a href="#常见方案" class="headerlink" title="常见方案"></a>常见方案</h2><p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/mysql-img/1665146153202.png" style="zoom:90%;" /></p>
+<h2 id="2PC（两阶段提交）方案"><a href="#2PC（两阶段提交）方案" class="headerlink" title="2PC（两阶段提交）方案"></a>2PC（两阶段提交）方案</h2><p>两阶段提交协议（Two Phase Commit）不是在XA规范中提出，但是XA规范对其进行了优化。而从字面意思来理解，Two Phase Commit，就是将提交(commit)过程划分为2个阶段(Phase)：</p>
+<p><strong>阶段1：</strong></p>
+<ul>
+<li>TM通知各个RM准备提交它们的事务分支。如果RM判断自己进行的工作可以被提交，那就对工作内容进行持久化，再给TM肯定答复；要是发生了其他情况，那给TM的都是否定答复。在发送了否定答复并回滚了已经的工作后，RM就可以丢弃这个事务分支信息。</li>
+<li>以mysql数据库为例，在第一阶段，事务管理器向所有涉及到的数据库服务器发出prepare”准备提交”请求，数据库收到请求后执行数据修改和日志记录等处理，处理完成后只是把事务的状态改成”可以提交”,然后把结果返回给事务管理器。</li>
+</ul>
+<p><strong>阶段2</strong></p>
+<ul>
+<li>TM根据阶段1各个RM prepare的结果，决定是提交还是回滚事务。如果所有的RM都prepare成功，那么TM通知所有的RM进行提交；如果有RM prepare失败的话，则TM通知所有RM回滚自己的事务分支。</li>
+<li>以mysql数据库为例，如果第一阶段中所有数据库都prepare成功，那么事务管理器向数据库服务器发出”确认提交”请求，数据库服务器把事务的”可以提交”状态改为”提交完成”状态，然后返回应答。如果在第一阶段内有任何一个数据库的操作发生了错误，或者事务管理器收不到某个数据库的回应，则认为事务失败，回撤所有数据库的事务。数据库服务器收不到第二阶段的确认提交请求，也会把”可以提交”的事务回撤。</li>
+</ul>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/mysql-img/1665146392477.png" style="zoom:90%;" /></p>
+<p><strong>两阶段提交协议(2PC)存在的问题</strong></p>
+<p>二阶段提交看起来确实能够提供原子性的操作，但是不幸的是，二阶段提交还是有几个缺点的：</p>
+<ul>
+<li><p><strong>1、同步阻塞问题。</strong><br>两阶段提交方案下全局事务的ACID特性，是依赖于RM的。一个全局事务内部包含了多个独立的事务分支，这一组事务分支要不都成功，要不都失败。各个事务分支的ACID特性共同构成了全局事务的ACID特性。也就是将单个事务分支的支持的ACID特性提升一个层次到分布式事务的范畴。 即使在本地事务中，如果对操作读很敏感，我们也需要将事务隔离级别设置为SERIALIZABLE。而对于分布式事务来说，更是如此，可重复读隔离级别不足以保证分布式事务一致性。如果我们使用mysql来支持XA分布式事务的话，那么最好将事务隔离级别设置为SERIALIZABLE，然而SERIALIZABLE(串行化)是四个事务隔离级别中最高的一个级别，也是执行效率最低的一个级别。</p>
+</li>
+<li><p><strong>2、单点故障。</strong><br>由于协调者的重要性，一旦协调者TM发生故障，参与者RM会一直阻塞下去。尤其在第二阶段，协调者发生故障，那么所有的参与者还都处于锁定事务资源的状态中，而无法继续完成事务操作。（如果是协调者挂掉，可以重新选举一个协调者，但是无法解决因为协调者宕机导致的参与者处于阻塞状态的问题）</p>
+</li>
+<li><p><strong>3、数据不一致。</strong><br>在二阶段提交的阶段二中，当协调者向参与者发送commit请求之后，发生了局部网络异常或者在发送commit请求过程中协调者发生了故障，这会导致只有一部分参与者接受到了commit请求，而在这部分参与者接到commit请求之后就会执行commit操作，但是其他部分未接到commit请求的机器则无法执行事务提交。于是整个分布式系统便出现了数据不一致性的现象。</p>
+</li>
+</ul>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/mysql-img/1665455319708.png" style="zoom:90%;" /></p>
+<h2 id="TCC"><a href="#TCC" class="headerlink" title="TCC"></a>TCC</h2><p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/mysql-img/1665149765508.png" style="zoom:90%;" /></p>
+<p><strong>在阶段1：</strong></p>
+<ul>
+<li>在XA中，各个RM准备提交各自的事务分支，事实上就是准备提交资源的更新操作(insert、delete、update等)；而在TCC中，是主业务活动请求(try)各个从业务服务预留资源。</li>
+</ul>
+<p><strong>在阶段2：</strong></p>
+<ul>
+<li>XA根据第一阶段每个RM是否都prepare成功，判断是要提交还是回滚。如果都prepare成功，那么就commit每个事务分支，反之则rollback每个事务分支。</li>
+<li>TCC中，如果在第一阶段所有业务资源都预留成功，那么confirm各个从业务服务，否则取消(cancel)所有从业务服务的资源预留请求。</li>
+</ul>
+<p><strong>TCC两阶段提交与XA两阶段提交的区别是：</strong></p>
+<ul>
+<li><span class='p blue'>XA是资源层面的分布式事务，强一致性，在两阶段提交的整个过程中，一直会持有资源的锁。</span></li>
+<li><span class='p blue'>TCC是业务层面的分布式事务，最终一致性，不会一直持有资源的锁。</span>
+</li>
+</ul>
+<p><strong>TCC事务的优缺点：</strong></p>
+<ul>
+<li><p><strong>优点：</strong>XA两阶段提交资源层面的，而TCC实际上把资源层面二阶段提交上提到了业务层面来实现。有效了的避免了XA两阶段提交占用资源锁时间过长导致的性能地下问题。<br>相对于 AT 模式，TCC 模式对业务代码有一定的侵入性，但是 TCC 模式无 AT 模式的全局行锁，TCC 性能会比 AT 模式高很多。</p>
+</li>
+<li><p><strong>缺点：</strong>主业务服务和从业务服务都需要进行改造，从业务方改造成本更高。原来只需要提供一个接口，现在需要改造成try、confirm、canel 3个接口，开发成本高。</p>
+</li>
+</ul>
+<h3 id="空回滚"><a href="#空回滚" class="headerlink" title="空回滚"></a>空回滚</h3><p>空回滚：在没有调用 TCC 资源 Try 方法的情况下，调用了二阶段的 Cancel 方法，Cancel 方法需要识别出这是一个空回滚，然后直接返回成功。</p>
+<p>空回滚出现的原因:  Try超时（丢包），分布式事务回滚触发Cancel，出现未收到Try，收到Cancel的情况</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/mysql-img/1665150476612.png" style="zoom:90%;" /></p>
+<h3 id="悬挂"><a href="#悬挂" class="headerlink" title="悬挂"></a>悬挂</h3><p>悬挂：Cancel比Try先执行</p>
+<p>悬挂出现的原因：Try超时（拥堵），分布式事务回滚触发Cancel，之后拥堵的Try到达</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/mysql-img/1665150539746.png" style="zoom:90%;" /></p>
+<h3 id="幂等控制"><a href="#幂等控制" class="headerlink" title="幂等控制"></a>幂等控制</h3><p>因为网络抖动或拥堵可能会超时，事务管理器会对资源进行重试操作，所以很可能一个业务操作会被重复调用，为了不因为重复调用而多次占用资源，需要对服务设计时进行幂等控制，通常我们可以用事务 xid 或业务主键判重来控制。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/mysql-img/1665150607149.png" style="zoom:90%;" /></p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/mysql-img/1665456811040.png" style="zoom:90%;" /></p>
+<h3 id="案例设计"><a href="#案例设计" class="headerlink" title="案例设计"></a>案例设计</h3><p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/mysql-img/1665150747845.png" style="zoom:90%;" /></p>
+<h2 id="可靠消息最终一致性"><a href="#可靠消息最终一致性" class="headerlink" title="可靠消息最终一致性"></a>可靠消息最终一致性</h2><p>方案一：mq+消息日志表 OR 参照订单业务</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/mysql-img/1665458438794.png" style="zoom:90%;" /></p>
+<blockquote>
+<p>我们自己通过消息日志表，确认另一方事务是否成功</p>
+</blockquote>
+<p>方案二：rocketmq事务消息</p>
+<blockquote>
+<p>由rocketmq本身确保自身事务是否成功</p>
+</blockquote>
+<h2 id="Seata"><a href="#Seata" class="headerlink" title="Seata"></a>Seata</h2><blockquote>
+<p>上述都是关于分布式事务的理论知识，实际开发中，实现分布式事务可以利用案例的seata完成</p>
+<p>seata提供了AT、TCC、Saga、XA四种不同的分布式处理方式。</p>
+</blockquote>
+<p>一个典型的 Saga 案例是在线订单的处理过程。假设一个在线商店接收到一个新的订单，该订单需要进行一系列复杂的操作，包括扣款、库存扣减、发货等。如果一个事务中包含了所有这些操作，而其中任何一个操作出现错误，整个事务都必须回滚，这样就会导致整个订单处理失败，给客户带来不良体验。在这种情况下，使用 Saga 分布式事务可以大大降低出错的可能性。</p>
+<p>在 Saga 分布式事务中，可以将订单处理拆分为多个子事务（如扣款、库存扣减、发货等）。每个子事务都是独立的事件，由不同的服务处理，并将事件状态写入数据库中。如果有任何一个子事件处理失败，则 Saga 将自动回滚整个订单的处理流程。这样每个子事件的失败对整个订单处理的影响也就被限制在了最小范围内。</p>
+<p>举一个具体的实际案例，Spring Cloud 和 Seata 实现的订单系统就是一个使用 Saga 分布式事务的典型案例。该系统使用 Seata 编写了订单扣减服务、库存服务和物流服务，每个服务都是独立的单元，对应业务场景中的一个子事务。当有新订单时，订单扣减服务会发送一条扣款事件，库存服务会接收该事件并进行库存扣减处理，处理成功后返回结果。物流服务也会接收该事件并进行发货处理，处理成功后返回结果。如果有任何一个服务处理失败，Seata 将自动回滚整个订单的处理流程。这个案例表明，使用 Saga 分布式事务可以将一个复杂的业务场景分解为多个子事务，并在整个处理过程中协调和管理各个子事务的执行状态，大大提高了系统的健壮性和可靠性。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://github.com/Ginkgovio/Ginkgovio-Blog.github.io.git">Ginkgovio</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://github.com/2023/06/04/Mysql-01/">https://github.com/2023/06/04/Mysql-01/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://github.com" target="_blank">Ginkgovio-Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/mysql/">mysql</a></div><div class="post_share"><div class="social-share" data-image="/img/lunbo-08.jpg" data-sites="facebook,twitter,wechat,qq"></div><link rel="stylesheet" href="https://lib.baomitu.com/social-share.js/1.0.16/css/share.min.css" media="print" onload="this.media='all'"><script src="https://lib.baomitu.com/social-share.js/1.0.16/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/06/04/JMM-01/" title="JMM专项"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/lunbo-09.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">JMM专项</div></div></a></div><div class="next-post pull-right"><a href="/2023/06/03/C-01/" title="C语言简介"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/lunbo-16.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">C语言简介</div></div></a></div></nav><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="waline-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="author_top is-center"><div class="card-info-avatar"><div class="avatar-img"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/assets/gk-01.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-status-box"><div class="author-status"><g-emoji class="g-emoji" alias="palm_tree" fallback-src="https://lskypro.acozycotage.net/LightPicture/2022/12/fe1dc0402e623096.jpg">🐟</g-emoji><span>认真摸鱼中</span></div></div></div><!--.avatar-imgimg(src=url_for(theme.avatar.img) onerror=`this.onerror=null;this.src='` + url_for(theme.error_img.flink) + `'` alt="avatar")--><div class="author-info__name">Ginkgovio</div><div class="author-info__description">疯了吧喜欢二次元</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">12</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">8</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><a id="card-info-btn" href="https://github.com/Ginkgovio/Ginkgovio-Blog.github.io.git"><i class="fab fa-github"></i><span>⚓前往ONE PIECE...</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/Ginkgovio-Blog.github.io" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:2511842759@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">欢迎各位拜访寒舍！</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E5%8C%BA%E5%88%AB"><span class="toc-number">1.</span> <span class="toc-text">存储引擎区别</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#InnoDB%E7%B4%A2%E5%BC%95"><span class="toc-number">2.</span> <span class="toc-text">InnoDB索引</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84"><span class="toc-number">2.1.</span> <span class="toc-text">索引结构</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#B-Tree%E7%BB%93%E6%9E%84"><span class="toc-number">2.1.1.</span> <span class="toc-text">B-Tree结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#B-Tree%E7%BB%93%E6%9E%84-1"><span class="toc-number">2.1.2.</span> <span class="toc-text">B+Tree结构</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B4%A2%E5%BC%95%E5%88%86%E7%B1%BB"><span class="toc-number">2.2.</span> <span class="toc-text">索引分类</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%81%9A%E7%B0%87%E7%B4%A2%E5%BC%95"><span class="toc-number">2.2.1.</span> <span class="toc-text">聚簇索引</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%E7%BA%A7%E7%B4%A2%E5%BC%95"><span class="toc-number">2.2.2.</span> <span class="toc-text">二级索引</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B4%A2%E5%BC%95%E6%93%8D%E4%BD%9C"><span class="toc-number">2.3.</span> <span class="toc-text">索引操作</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B4%A2%E5%BC%95%E5%88%9B%E5%BB%BA%E5%8E%9F%E5%88%99"><span class="toc-number">2.4.</span> <span class="toc-text">索引创建原则</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B4%A2%E5%BC%95%E5%A4%B1%E6%95%88%E5%B8%B8%E8%A7%81%E6%83%85%E5%86%B5"><span class="toc-number">2.5.</span> <span class="toc-text">索引失效常见情况</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%B8%E5%85%B3%E6%A6%82%E5%BF%B5"><span class="toc-number">2.6.</span> <span class="toc-text">相关概念</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B4%A2%E5%BC%95%E4%B8%8B%E6%8E%A8"><span class="toc-number">2.6.1.</span> <span class="toc-text">索引下推</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#filesort%E6%96%87%E4%BB%B6%E6%8E%92%E5%BA%8F"><span class="toc-number">2.6.2.</span> <span class="toc-text">filesort文件排序</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B4%A2%E5%BC%95%E8%AE%BE%E8%AE%A1%E5%AE%9E%E6%88%98"><span class="toc-number">2.7.</span> <span class="toc-text">索引设计实战</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92-explain"><span class="toc-number">3.</span> <span class="toc-text">执行计划-explain</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#id%E5%88%97"><span class="toc-number">3.1.</span> <span class="toc-text">id列</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#select-type%E5%88%97"><span class="toc-number">3.2.</span> <span class="toc-text">select_type列</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#table%E5%88%97"><span class="toc-number">3.3.</span> <span class="toc-text">table列</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#type%E5%88%97"><span class="toc-number">3.4.</span> <span class="toc-text">type列</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#possible-keys%E5%88%97"><span class="toc-number">3.5.</span> <span class="toc-text">possible_keys列</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#key%E5%88%97"><span class="toc-number">3.6.</span> <span class="toc-text">key列</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#key-len%E5%88%97"><span class="toc-number">3.7.</span> <span class="toc-text">key_len列</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ref%E5%88%97"><span class="toc-number">3.8.</span> <span class="toc-text">ref列</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#rows%E5%88%97"><span class="toc-number">3.9.</span> <span class="toc-text">rows列</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Extra%E5%88%97"><span class="toc-number">3.10.</span> <span class="toc-text">Extra列</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E9%80%89%E6%8B%A9"><span class="toc-number">4.</span> <span class="toc-text">数据类型选择</span></a></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">5.</span> <span class="toc-text">事务隔离级别原理之MVCC</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%BB%98%E8%AE%A4%E5%AD%97%E6%AE%B5"><span class="toc-number">5.1.</span> <span class="toc-text">默认字段</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ReadView"><span class="toc-number">5.2.</span> <span class="toc-text">ReadView</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#MySQL%E4%B9%8BBufferPool"><span class="toc-number">6.</span> <span class="toc-text">MySQL之BufferPool</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#mysql%E4%B9%8Bbinlog-amp-redolog-amp-undolog"><span class="toc-number">7.</span> <span class="toc-text">mysql之binlog&amp;redolog&amp;undolog</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1"><span class="toc-number">8.</span> <span class="toc-text">分布式事务</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E6%96%B9%E6%A1%88"><span class="toc-number">8.1.</span> <span class="toc-text">常见方案</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2PC%EF%BC%88%E4%B8%A4%E9%98%B6%E6%AE%B5%E6%8F%90%E4%BA%A4%EF%BC%89%E6%96%B9%E6%A1%88"><span class="toc-number">8.2.</span> <span class="toc-text">2PC（两阶段提交）方案</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TCC"><span class="toc-number">8.3.</span> <span class="toc-text">TCC</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A9%BA%E5%9B%9E%E6%BB%9A"><span class="toc-number">8.3.1.</span> <span class="toc-text">空回滚</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%82%AC%E6%8C%82"><span class="toc-number">8.3.2.</span> <span class="toc-text">悬挂</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B9%82%E7%AD%89%E6%8E%A7%E5%88%B6"><span class="toc-number">8.3.3.</span> <span class="toc-text">幂等控制</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A1%88%E4%BE%8B%E8%AE%BE%E8%AE%A1"><span class="toc-number">8.3.4.</span> <span class="toc-text">案例设计</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%AF%E9%9D%A0%E6%B6%88%E6%81%AF%E6%9C%80%E7%BB%88%E4%B8%80%E8%87%B4%E6%80%A7"><span class="toc-number">8.4.</span> <span class="toc-text">可靠消息最终一致性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Seata"><span class="toc-number">8.5.</span> <span class="toc-text">Seata</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2023/06/04/JVM-04/" title="JVM专项-第四篇"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/lunbo-10.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="JVM专项-第四篇"/></a><div class="content"><a class="title" href="/2023/06/04/JVM-04/" title="JVM专项-第四篇">JVM专项-第四篇</a><time datetime="2023-06-04T15:00:00.000Z" title="发表于 2023-06-04 23:00:00">2023-06-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/06/04/JVM-03/" title="JVM专项-第三篇"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/lunbo-11.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="JVM专项-第三篇"/></a><div class="content"><a class="title" href="/2023/06/04/JVM-03/" title="JVM专项-第三篇">JVM专项-第三篇</a><time datetime="2023-06-04T11:00:00.000Z" title="发表于 2023-06-04 19:00:00">2023-06-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/06/04/JVM-02/" title="JVM专项-第二篇"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/lunbo-12.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="JVM专项-第二篇"/></a><div class="content"><a class="title" href="/2023/06/04/JVM-02/" title="JVM专项-第二篇">JVM专项-第二篇</a><time datetime="2023-06-04T10:00:00.000Z" title="发表于 2023-06-04 18:00:00">2023-06-04</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2023 By Ginkgovio</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button><button class="share" type="button" title="右键模式" onclick="changeMouseMode()"><i class="fas fa-mouse"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button class="share" type="button" title="分享链接" onclick="share()"><i class="fas fa-share-node"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button><button id="go-down" type="button" title="直达底部" onclick="btf.scrollToDest(document.body.scrollHeight, 500)"><i class="fas fa-arrow-down"></i></button></div></div><div class="js-pjax" id="rightMenu"><div class="rightMenu-group rightMenu-small"><a class="rightMenu-item" href="javascript:window.history.back();"><i class="fa fa-arrow-left"></i></a><a class="rightMenu-item" href="javascript:window.history.forward();"><i class="fa fa-arrow-right"></i></a><a class="rightMenu-item" href="javascript:window.location.reload();"><i class="fa fa-refresh"></i></a><a class="rightMenu-item" href="javascript:rmf.scrollToTop();"><i class="fa fa-arrow-up"></i></a></div><div class="rightMenu-group rightMenu-line hide" id="menu-text"><a class="rightMenu-item" href="javascript:rmf.copySelect();"><i class="fa fa-copy"></i><span>复制</span></a><a class="rightMenu-item" href="javascript:window.open(&quot;https://www.google.com/webhp/s?wd=&quot;+window.getSelection().toString());window.location.reload();"><i class="fa fa-search"></i><span>谷歌搜索</span></a></div><div class="rightMenu-group rightMenu-line hide" id="menu-too"><a class="rightMenu-item" href="javascript:window.open(window.getSelection().toString());window.location.reload();"><i class="fa fa-link"></i><span>转到链接</span></a></div><div class="rightMenu-group rightMenu-line hide" id="menu-paste"><a class="rightMenu-item" href="javascript:rmf.paste()"><i class="fa fa-copy"></i><span>粘贴</span></a></div><div class="rightMenu-group rightMenu-line hide" id="menu-post"><a class="rightMenu-item" href="#post-comment"><i class="fas fa-comment"></i><span>空降评论</span></a><a class="rightMenu-item" href="javascript:rmf.copyWordsLink()"><i class="fa fa-link"></i><span>复制本文地址</span></a></div><div class="rightMenu-group rightMenu-line hide" id="menu-to"><a class="rightMenu-item" href="javascript:rmf.openWithNewTab()"><i class="fa fa-window-restore"></i><span>新窗口打开</span></a><a class="rightMenu-item" id="menu-too" href="javascript:rmf.open()"><i class="fa fa-link"></i><span>转到链接</span></a><a class="rightMenu-item" href="javascript:rmf.copyLink()"><i class="fa fa-copy"></i><span>复制链接</span></a></div><div class="rightMenu-group rightMenu-line hide" id="menu-img"><a class="rightMenu-item" href="javascript:rmf.saveAs()"><i class="fa fa-download"></i><span>保存图片</span></a><a class="rightMenu-item" href="javascript:rmf.openWithNewTab()"><i class="fa fa-window-restore"></i><span>在新窗口打开</span></a><a class="rightMenu-item" href="javascript:rmf.copyLink()"><i class="fa fa-copy"></i><span>复制图片链接</span></a></div><div class="rightMenu-group rightMenu-line"><a class="rightMenu-item" href="javascript:randomPost()"><i class="fa fa-paper-plane"></i><span>随便逛逛</span></a><!--a.rightMenu-item(href="javascript:switchNightMode();")i.fa.fa-moon
+span='昼夜切换'--><a class="rightMenu-item" href="/personal/about/"><i class="fa fa-info-circle"></i><span>关于博客</span></a><!--a.rightMenu-item(href="javascript:toggleWinbox();")i.fas.fa-cog
+span='美化设置'--><a class="rightMenu-item" href="javascript:rmf.fullScreen();"><i class="fas fa-expand"></i><span>切换全屏</span></a><a class="rightMenu-item" href="javascript:window.print();"><i class="fa-solid fa-print"></i><span>打印页面</span></a></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.17/fancybox/fancybox.umd.min.js"></script><script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/instant.page/5.1.0/instantpage.min.js" type="module"></script><script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/vanilla-lazyload/17.3.1/lazyload.iife.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/node-snackbar/0.1.16/snackbar.min.js"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('https://cdnjs.cloudflare.com/ajax/libs/pangu/4.0.7/pangu.min.js')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
+
+function panguInit () {
+  if (true){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit)</script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"]],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.1
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, ''],
+        insertScript: [200, () => {
+          document.querySelectorAll('mjx-container').forEach(node => {
+            if (node.hasAttribute('display')) {
+              btf.wrap(node, 'div', { class: 'mathjax-overflow' })
+            } else {
+              btf.wrap(node, 'span', { class: 'mathjax-overflow' })
+            }
+          });
+        }, '', false]
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typesetPromise()
+}</script><script>function loadWaline () {
+  function initWaline () {
+    const waline = Waline.init(Object.assign({
+      el: '#waline-wrap',
+      serverURL: 'lean-clound-comments.vercel.app',
+      pageview: false,
+      dark: 'html[data-theme="dark"]',
+      path: window.location.pathname,
+      comment: false,
+    }, null))
+  }
+
+  const walineCSSLoad = document.getElementById('waline-css')
+
+  if (typeof Waline === 'object') {
+    walineCSSLoad ? initWaline() : getCSS('https://cdnjs.cloudflare.com/ajax/libs/waline/2.15.4/waline.min.css','waline-css').then(initWaline)
+  }
+  else {
+    getCSS('https://cdnjs.cloudflare.com/ajax/libs/waline/2.15.4/waline.min.css','waline-css').then(() => {
+      getScript('https://cdnjs.cloudflare.com/ajax/libs/waline/2.15.4/waline.min.js').then(initWaline)
+    })
+  }
+}
+
+if ('Waline' === 'Waline' || !false) {
+  if (false) btf.loadComment(document.getElementById('waline-wrap'),loadWaline)
+  else setTimeout(loadWaline, 0)
+} else {
+  function loadOtherComment () {
+    loadWaline()
+  }
+}</script></div><canvas id="universe"></canvas><script defer src="/js/universe.js"></script><script defer src="/js/cursor.js"></script><script defer data-pjax src="/js/emoji.js"></script><script src="https://cdn.bootcdn.net/ajax/libs/clipboard.js/2.0.11/clipboard.min.js"></script><script src="/js/share.js"></script><script type="text/javascript" src="https://cdn1.tianli0.top/npm/jquery@latest/dist/jquery.min.js"></script><script type="text/javascript" src="/js/rightmenu.js"></script><script async src="https://cdn1.tianli0.top/npm/vue@2.6.14/dist/vue.min.js"></script><script async src="https://cdn1.tianli0.top/npm/element-ui@2.15.6/lib/index.js"></script><script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/clipboard.js/2.0.11/clipboard.js"></script><script type="text/javascript" src="/js/rightmenu.js"></script><script src="/js/randomPost.js"></script><script defer="defer" id="fluttering_ribbon" mobile="true" src="https://cdnjs.cloudflare.com/ajax/libs/butterfly-extsrc/1.1.3/canvas-fluttering-ribbon.min.js"></script><script id="click-heart" src="https://cdnjs.cloudflare.com/ajax/libs/butterfly-extsrc/1.1.3/click-heart.min.js" async="async" mobile="false"></script><link rel="stylesheet" href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/aplayer/1.10.1/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/aplayer/1.10.1/APlayer.min.js"></script><script src="https://cdn1.tianli0.top/npm/js-heo@1.0.12/metingjs/Meting.min.js"></script><script src="https://lib.baomitu.com/pjax/0.2.8/pjax.min.js"></script><script>let pjaxSelectors = ["head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:send', function () {
+
+  // removeEventListener scroll 
+  window.tocScrollFn && window.removeEventListener('scroll', window.tocScrollFn)
+  window.scrollCollect && window.removeEventListener('scroll', scrollCollect)
+
+  document.getElementById('rightside').style.cssText = "opacity: ''; transform: ''"
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+
+  typeof disqusjs === 'object' && disqusjs.destroy()
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof chatBtnFn === 'function' && chatBtnFn()
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+})
+
+document.addEventListener('pjax:error', (e) => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div class="no-result" id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div><!-- hexo injector body_end start --> <script data-pjax>if(document.getElementById('recent-posts') && (location.pathname ==='/'|| '/' ==='all')){
+    var parent = document.getElementById('recent-posts');
+    var child = '<div class="recent-post-item" style="width:100%;height: auto"><div id="catalog_magnet"><div class="magnet_item"><a class="magnet_link" href="https://github.com/categories/C/"><div class="magnet_link_context" style=""><span style="font-weight:500;flex:1">👨‍🚀 Cの从入门到入土 (1)</span><span style="padding:0px 4px;border-radius: 8px;"><i class="fas fa-arrow-circle-right"></i></span></div></a></div><div class="magnet_item"><a class="magnet_link" href="https://github.com/categories/Java/"><div class="magnet_link_context" style=""><span style="font-weight:500;flex:1">🐱‍👓 Javaの从入门到转行 (6)</span><span style="padding:0px 4px;border-radius: 8px;"><i class="fas fa-arrow-circle-right"></i></span></div></a></div><div class="magnet_item"><a class="magnet_link" href="https://github.com/categories/计算机组成原理/"><div class="magnet_link_context" style=""><span style="font-weight:500;flex:1">🚀 带你走进底层的世界 (1)</span><span style="padding:0px 4px;border-radius: 8px;"><i class="fas fa-arrow-circle-right"></i></span></div></a></div><div class="magnet_item"><a class="magnet_link" href="https://github.com/categories/计算机网络/"><div class="magnet_link_context" style=""><span style="font-weight:500;flex:1">👩‍💻 想当黑客不？ (1)</span><span style="padding:0px 4px;border-radius: 8px;"><i class="fas fa-arrow-circle-right"></i></span></div></a></div><a class="magnet_link_more"  href="https://github.com/categories" style="flex:1;text-align: center;margin-bottom: 10px;">查看更多...</a></div></div>';
+    console.log('已挂载magnet')
+    parent.insertAdjacentHTML("afterbegin",child)}
+     </script><style>#catalog_magnet{flex-wrap: wrap;display: flex;width:100%;justify-content:space-between;padding: 10px 10px 0 10px;align-content: flex-start;}.magnet_item{flex-basis: calc(50% - 5px);background: #f2f2f2;margin-bottom: 10px;border-radius: 8px;transition: all 0.2s ease-in-out;}.magnet_item:hover{background: #69e8f2}.magnet_link_more{color:#555}.magnet_link{color:black}.magnet_link:hover{color:white}@media screen and (max-width: 600px) {.magnet_item {flex-basis: 100%;}}.magnet_link_context{display:flex;padding: 10px;font-size:16px;transition: all 0.2s ease-in-out;}.magnet_link_context:hover{padding: 10px 20px;}</style>
+    <style></style><script data-pjax>
+    function butterfly_categories_card_injector_config(){
+      var parent_div_git = document.getElementById('recent-posts');
+      var item_html = '<style>li.categoryBar-list-item{width:32.3%;}.categoryBar-list{max-height: 190px;overflow:auto;}.categoryBar-list::-webkit-scrollbar{width:0!important}@media screen and (max-width: 650px){.categoryBar-list{max-height: 160px;}}</style><div class="recent-post-item" style="height:auto;width:100%;padding:0px;"><div id="categoryBar"><ul class="categoryBar-list"><li class="categoryBar-list-item" style="background:url(/img/fl-01.jpg);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/C/&quot;);" href="javascript:void(0);">C</a><span class="categoryBar-list-count">1</span><span class="categoryBar-list-descr"></span></li><li class="categoryBar-list-item" style="background:url(/img/fl-02.jpg);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/CPP/&quot;);" href="javascript:void(0);">CPP</a><span class="categoryBar-list-count">1</span><span class="categoryBar-list-descr"></span></li><li class="categoryBar-list-item" style="background:url(/img/fl-03.jpg);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/Java/&quot;);" href="javascript:void(0);">Java</a><span class="categoryBar-list-count">6</span><span class="categoryBar-list-descr"></span></li><li class="categoryBar-list-item" style="background:url(/img/fl-04.jpg);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/myql/&quot;);" href="javascript:void(0);">myql</a><span class="categoryBar-list-count">1</span><span class="categoryBar-list-descr"></span></li><li class="categoryBar-list-item" style="background:url(/img/fl-05.jpg);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/计算机组成原理/&quot;);" href="javascript:void(0);">计算机组成原理</a><span class="categoryBar-list-count">1</span><span class="categoryBar-list-descr"></span></li><li class="categoryBar-list-item" style="background:url(/img/fl-06.jpg);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/计算机网络/&quot;);" href="javascript:void(0);">计算机网络</a><span class="categoryBar-list-count">1</span><span class="categoryBar-list-descr"></span></li></ul></div></div>';
+      console.log('已挂载butterfly_categories_card')
+      parent_div_git.insertAdjacentHTML("afterbegin",item_html)
+      }
+    if( document.getElementById('recent-posts') && (location.pathname ==='/'|| '/' ==='all')){
+    butterfly_categories_card_injector_config()
+    }
+  </script><script data-pjax>
+  function butterfly_footer_beautify_injector_config(){
+    var parent_div_git = document.getElementById('footer-wrap');
+    var item_html = '<div id="workboard"></div><p id="ghbdages"><a class="github-badge" target="_blank" href="https://hexo.io/" style="margin-inline:5px" data-title="博客框架为Hexo_v6.3.0" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Frame-Hexo-blue?style=flat&amp;logo=hexo" alt=""/></a><a class="github-badge" target="_blank" href="https://butterfly.js.org/" style="margin-inline:5px" data-title="主题版本Butterfly_v4.8.5" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Theme-Butterfly-6513df?style=flat&amp;logo=bitdefender" alt=""/></a><a class="github-badge" target="_blank" href="https://vercel.com/" style="margin-inline:5px" data-title="本站采用多线部署，主线路托管于Vercel" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Hosted-Vercel-brightgreen?style=flat&amp;logo=Vercel" alt=""/></a><a class="github-badge" target="_blank" href="https://dashboard.4everland.org/" style="margin-inline:5px" data-title="本站采用多线部署，备用线路托管于4EVERLAND" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Hosted-4EVERLAND-22DDDD?style=flat&amp;logo=IPFS" alt=""/></a><a class="github-badge" target="_blank" href="https://github.com/" style="margin-inline:5px" data-title="本站项目由Github托管" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Source-Github-d021d6?style=flat&amp;logo=GitHub" alt=""/></a><a class="github-badge" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" style="margin-inline:5px" data-title="本站采用知识共享署名-非商业性使用-相同方式共享4.0国际许可协议进行许可" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Copyright-BY--NC--SA%204.0-d42328?style=flat&amp;logo=Claris" alt=""/></a></p>';
+    console.log('已挂载butterfly_footer_beautify')
+    parent_div_git.insertAdjacentHTML("beforeend",item_html)
+    }
+  var elist = 'null'.split(',');
+  var cpage = location.pathname;
+  var epage = 'all';
+  var flag = 0;
+
+  for (var i=0;i<elist.length;i++){
+    if (cpage.includes(elist[i])){
+      flag++;
+    }
+  }
+
+  if ((epage ==='all')&&(flag == 0)){
+    butterfly_footer_beautify_injector_config();
+  }
+  else if (epage === cpage){
+    butterfly_footer_beautify_injector_config();
+  }
+  </script><script async src="/js/runtime.js"></script><script data-pjax>
+  function butterfly_swiper_injector_config(){
+    var parent_div_git = document.getElementById('recent-posts');
+    var item_html = '<div class="recent-post-item" style="height: auto;width: 100%"><div class="blog-slider swiper-container-fade swiper-container-horizontal" id="swiper_container"><div class="blog-slider__wrp swiper-wrapper" style="transition-duration: 0ms;"><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;2023/06/04/Mysql-01/&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/lunbo-08.jpg" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2023-06-04</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;2023/06/04/Mysql-01/&quot;);" href="javascript:void(0);" alt="">mysql专项</a><div class="blog-slider__text">mysql引擎区别以及分布式事务</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;2023/06/04/Mysql-01/&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;2023/06/03/计算机网络-01/&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/lunbo-13.jpg" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2023-06-03</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;2023/06/03/计算机网络-01/&quot;);" href="javascript:void(0);" alt="">计算机网络简介</a><div class="blog-slider__text">黑客的必备常识</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;2023/06/03/计算机网络-01/&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;2023/06/04/JVM-04/&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/lunbo-10.jpg" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2023-06-04</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;2023/06/04/JVM-04/&quot;);" href="javascript:void(0);" alt="">JVM专项-第四篇</a><div class="blog-slider__text">JAVA虚拟机</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;2023/06/04/JVM-04/&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;2023/06/04/JVM-03/&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/lunbo-11.jpg" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2023-06-04</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;2023/06/04/JVM-03/&quot;);" href="javascript:void(0);" alt="">JVM专项-第三篇</a><div class="blog-slider__text">JAVA虚拟机</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;2023/06/04/JVM-03/&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;2023/06/04/JVM-02/&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/lunbo-12.jpg" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2023-06-04</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;2023/06/04/JVM-02/&quot;);" href="javascript:void(0);" alt="">JVM专项-第二篇</a><div class="blog-slider__text">JAVA虚拟机</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;2023/06/04/JVM-02/&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;2023/06/04/JMM-01/&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/lunbo-09.jpg" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2023-06-04</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;2023/06/04/JMM-01/&quot;);" href="javascript:void(0);" alt="">JMM专项</a><div class="blog-slider__text">JAVA内存模型</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;2023/06/04/JMM-01/&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;2023/06/03/JVM-01/&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/lunbo-15.jpg" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2023-06-03</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;2023/06/03/JVM-01/&quot;);" href="javascript:void(0);" alt="">JVM专项-第一篇</a><div class="blog-slider__text">JAVA虚拟机</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;2023/06/03/JVM-01/&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;2023/06/03/CPP-01/&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/lunbo-03.jpg" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2023-06-03</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;2023/06/03/CPP-01/&quot;);" href="javascript:void(0);" alt="">C++语言简介</a><div class="blog-slider__text">C++语言支持C语言的绝大部分语法，除了C中的枚举</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;2023/06/03/CPP-01/&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;2023/06/03/C-01/&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/lunbo-16.jpg" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2023-06-03</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;2023/06/03/C-01/&quot;);" href="javascript:void(0);" alt="">C语言简介</a><div class="blog-slider__text">C语言是现在所有高级语言的鼻祖，没有C就没有现在的高级语言</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;2023/06/03/C-01/&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;2023/06/02/2023-6-2-firstpage/&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/lunbo-02.jpg" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2023-06-02</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;2023/06/02/2023-6-2-firstpage/&quot;);" href="javascript:void(0);" alt="">第一篇文章</a><div class="blog-slider__text">人生第一次</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;2023/06/02/2023-6-2-firstpage/&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div></div><div class="blog-slider__pagination swiper-pagination-clickable swiper-pagination-bullets"></div></div></div>';
+    console.log('已挂载butterfly_swiper')
+    parent_div_git.insertAdjacentHTML("afterbegin",item_html)
+    }
+  var elist = 'undefined'.split(',');
+  var cpage = location.pathname;
+  var epage = '/';
+  var flag = 0;
+
+  for (var i=0;i<elist.length;i++){
+    if (cpage.includes(elist[i])){
+      flag++;
+    }
+  }
+
+  if ((epage ==='all')&&(flag == 0)){
+    butterfly_swiper_injector_config();
+  }
+  else if (epage === cpage){
+    butterfly_swiper_injector_config();
+  }
+  </script><script defer src="https://npm.elemecdn.com/hexo-butterfly-swiper/lib/swiper.min.js"></script><script defer data-pjax src="https://npm.elemecdn.com/hexo-butterfly-swiper/lib/swiper_init.js"></script><div class="js-pjax"><script async="async">var arr = document.getElementsByClassName('recent-post-item');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__zoomIn');
+    arr[i].setAttribute('data-wow-duration', '2s');
+    arr[i].setAttribute('data-wow-delay', '1s');
+    arr[i].setAttribute('data-wow-offset', '100');
+    arr[i].setAttribute('data-wow-iteration', '1');
+  }</script><script async="async">var arr = document.getElementsByClassName('card-widget');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__fadeInBottomRight');
+    arr[i].setAttribute('data-wow-duration', '');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('pagination');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__zoomIn');
+    arr[i].setAttribute('data-wow-duration', '');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script></div><script defer src="https://npm.elemecdn.com/hexo-butterfly-wowjs/lib/wow.min.js"></script><script defer src="https://npm.elemecdn.com/hexo-butterfly-wowjs/lib/wow_init.js"></script><script async src="//at.alicdn.com/t/font_2032782_8d5kxvn09md.js"></script><script data-pjax src="https://npm.elemecdn.com/hexo-filter-gitcalendar/lib/gitcalendar.js"></script><script data-pjax>
+  function gitcalendar_injector_config(){
+      var parent_div_git = document.getElementById('gitZone');
+      var item_html = '<div class="recent-post-item" id="gitcalendarBar" style="width:100%;height:auto;padding:10px;"><style>#git_container{min-height: 280px}@media screen and (max-width:650px) {#git_container{min-height: 0px}}</style><div id="git_loading" style="width:10%;height:100%;margin:0 auto;display: block;"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 50 50" style="enable-background:new 0 0 50 50" xml:space="preserve"><path fill="#d0d0d0" d="M25.251,6.461c-10.318,0-18.683,8.365-18.683,18.683h4.068c0-8.071,6.543-14.615,14.615-14.615V6.461z" transform="rotate(275.098 25 25)"><animatetransform attributeType="xml" attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="0.6s" repeatCount="indefinite"></animatetransform></path></svg><style>#git_container{display: none;}</style></div><div id="git_container"></div></div>';
+      parent_div_git.insertAdjacentHTML("afterbegin",item_html)
+      console.log('已挂载gitcalendar')
+      }
+
+    if( document.getElementById('gitZone') && (location.pathname ==='/about/'|| '/about/' ==='all')){
+        gitcalendar_injector_config()
+        GitCalendarInit("https://gitcalendar.fomal.cc/api?Ginkgovio",['#d9e0df', '#c6e0dc', '#a8dcd4', '#9adcd2', '#89ded1', '#77e0d0', '#5fdecb', '#47dcc6', '#39dcc3', '#1fdabe', '#00dab9'],'Ginkgovio')
+    }
+  </script><!-- hexo injector body_end end --><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body></html>

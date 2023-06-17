@@ -1,0 +1,749 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>JMM专项 | Ginkgovio-Blog</title><meta name="author" content="Ginkgovio"><meta name="copyright" content="Ginkgovio"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="JAVA内存模型">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JMM专项">
+<meta property="og:url" content="https://github.com/2023/06/04/JMM-01/index.html">
+<meta property="og:site_name" content="Ginkgovio-Blog">
+<meta property="og:description" content="JAVA内存模型">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://github.com/img/lunbo-09.jpg">
+<meta property="article:published_time" content="2023-06-04T09:00:00.000Z">
+<meta property="article:modified_time" content="2023-06-04T09:00:00.000Z">
+<meta property="article:author" content="Ginkgovio">
+<meta property="article:tag" content="JMM">
+<meta property="article:tag" content="Java">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://github.com/img/lunbo-09.jpg"><link rel="shortcut icon" href="/img/mbys.png"><link rel="canonical" href="https://github.com/2023/06/04/JMM-01/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/node-snackbar/0.1.16/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.17/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":true,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: {"limitDay":366,"position":"top","messagePrev":"It has been","messageNext":"days since the last update, the content of the article may be outdated."},
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":230},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"top-right"},
+  source: {
+    justifiedGallery: {
+      js: 'https://cdnjs.cloudflare.com/ajax/libs/flickr-justified-gallery/2.1.2/fjGallery.min.js',
+      css: 'https://cdnjs.cloudflare.com/ajax/libs/flickr-justified-gallery/2.1.2/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isAnchor: true,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'JMM专项',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: true,
+  isToc: true,
+  postUpdate: '2023-06-04 17:00:00'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const now = new Date()
+          const hour = now.getHours()
+          const isNight = hour <= 6 || hour >= 18
+          if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+          else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/custom.css" media="defer" onload="this.media='all'"><link rel="stylesheet" href="https://cdn1.tianli0.top/npm/element-ui@2.15.6/packages/theme-chalk/lib/index.css"><!-- hexo injector head_end start --><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Zfour/Butterfly-double-row-display@1.00/cardlistpost.min.css"/>
+<style>#recent-posts > .recent-post-item >.recent-post-info > .article-meta-wrap > .tags:before {content:"\A";
+  white-space: pre;}#recent-posts > .recent-post-item >.recent-post-info > .article-meta-wrap > .tags > .article-meta__separator{display:none}</style>
+<link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-categories-card@1.0.0/lib/categorybar.css"><link rel="stylesheet" href="https://www.fomal.cc/static/css/runtime.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-swiper/lib/swiper.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-swiper/lib/swiperstyle.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-wowjs/lib/animate.min.css" media="print" onload="this.media='screen'"><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-tag-plugins-plus@latest/lib/assets/font-awesome-animation.min.css" media="defer" onload="this.media='all'"><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-tag-plugins-plus@latest/lib/tag_plugins.css" media="defer" onload="this.media='all'"><script src="https://npm.elemecdn.com/hexo-butterfly-tag-plugins-plus@latest/lib/assets/carousel-touch.js"></script><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-filter-gitcalendar/lib/gitcalendar.css" media="print" onload="this.media='all'"><!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><script>const preloader = {
+  endLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = 'hidden';
+    document.getElementById('loading-box').classList.remove("loaded")
+  }
+}
+
+preloader.initLoading()
+window.addEventListener('load',()=> { preloader.endLoading() })
+
+if (true) {
+  document.addEventListener('pjax:send', () => { preloader.initLoading() })
+  document.addEventListener('pjax:complete', () => { preloader.endLoading() })
+}</script><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/assets/gk-01.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">12</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">8</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group hide" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 休闲</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/bookshelf/"><i class="fa-fw fas fa-book"></i><span> 书架</span></a></li><li><a class="site-page child" href="/bangumis/"><i class="fa-fw fas fa-video"></i><span> 番剧</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片墙</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comments/"><i class="fa-fw fas fa-envelope-open"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/lunbo-09.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="Ginkgovio-Blog"><span class="site-name">Ginkgovio-Blog</span></a></span><div id="randomPost"><a class="site-page social-icon search" href="javascript:;" onclick="randomPost()" title="随机访问一篇文章"><i class="fas fa-circle-notch fa-fw"></i></a></div><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><!--span=' '+_p('search.title')--></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group hide" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 休闲</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/bookshelf/"><i class="fa-fw fas fa-book"></i><span> 书架</span></a></li><li><a class="site-page child" href="/bangumis/"><i class="fa-fw fas fa-video"></i><span> 番剧</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片墙</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comments/"><i class="fa-fw fas fa-envelope-open"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">JMM专项</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-06-04T09:00:00.000Z" title="发表于 2023-06-04 17:00:00">2023-06-04</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-06-04T09:00:00.000Z" title="更新于 2023-06-04 17:00:00">2023-06-04</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Java/">Java</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">7.6k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>26分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="JMM专项"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><div class="note default simple"><p>JAVA内存模型专项</p>
+</div>
+<div class="timeline blue"><div class='timeline-item headline'><div class='timeline-item-title'><div class='item-circle'><p>时间轴</p>
+</div></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2023-06-04 [ 1.0 ]</p>
+</div></div><div class='timeline-item-content'><p>首次发布</p>
+</div></div></div>
+<h1 id="JMM"><a href="#JMM" class="headerlink" title="JMM"></a>JMM</h1><blockquote>
+<p>JAVA内存模型</p>
+</blockquote>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/JMM-img/1665321288936.png" style="zoom:100%;" /></p>
+<span class='p blue'>主内存</span>
+<ul>
+<li>主要存储的是Java实例对象，所有线程创建的实例对象都存放在主内存中，不管该实例对象是成员变量还是方法中的本地变量(也称局部变量)，当然也包括了共享的类信息、常量、静态变量。由于是共享数据区域，<strong>多条线程对同一个变量进行访问可能会发生线程安全问题</strong>。</li>
+</ul>
+<span class='p blue'>工作内存</span>
+<ul>
+<li>主要存储当前方法的所有本地变量信息(<strong>工作内存中存储着主内存中的变量副本拷贝</strong>)，<strong>每个线程只能访问自己的工作内存，即线程中的本地变量对其它线程是不可见的</strong>，就算是两个线程执行的是同一段代码，它们也会各自在自己的工作内存中创建属于当前线程的本地变量，当然也包括了字节码行号指示器、相关Native方法的信息。注意由于工作内存是每个线程的私有数据，线程间无法相互访问工作内存，因此存储在工作内存的数据不存在线程安全问题。<br>根据JVM虚拟机规范主内存与工作内存的数据存储类型以及操作方式，对于一个实例对象中的成员方法而言，如果方法中包含本地变量是基本数据类型（boolean,byte,short,char,int,long,float,double），将直接存储在工作内存的帧栈结构中，但倘若本地变量是引用类型，那么该变量的引用会存储在功能内存的帧栈中，而对象实例将存储在主内存(共享数据区域，堆)中。<strong>但对于实例对象的成员变量，不管它是基本数据类型或者包装类型(Integer、Double等)还是引用类型，都会被存储到堆区。至于static变量以及类本身相关信息将会存储在主内存中</strong>。需要注意的是，在主内存中的实例对象可以被多线程共享，倘若两个线程同时调用了同一个对象的同一个方法，那么两条线程会将要操作的数据拷贝一份到自己的工作内存中，执行完成操作后才刷新到主内存</li>
+</ul>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/JMM-img/1665321605314.png" style="zoom:100%;" /></p>
+<span class='p blue'>Java内存模型与硬件内存架构的关系</span>
+<ul>
+<li>Java内存模型和硬件内存架构并不完全一致。对于硬件内存来说只有寄存器、缓存内存、主内存的概念，并没有工作内存(线程私有数据区域)和主内存(堆内存)之分，也就是说Java内存模型对内存的划分对硬件内存并没有任何影响，因为JMM只是一种抽象的概念，是一组规则，并不实际存在，不管是工作内存的数据还是主内存的数据，对于计算机硬件来说都会存储在计算机主内存中，当然也有可能存储到CPU缓存或者寄存器中，因此总体上来说，Java内存模型和计算机硬件内存架构是一个相互交叉的关系，是一种抽象概念划分与真实物理硬件的交叉。(注意对于Java内存区域划分也是同样的道理)</li>
+</ul>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/JMM-img/1665321764475.png" style="zoom:100%;" /></p>
+<hr>
+<h1 id="多线程问题"><a href="#多线程问题" class="headerlink" title="多线程问题"></a>多线程问题</h1><h2 id="原子性"><a href="#原子性" class="headerlink" title="原子性"></a>原子性</h2><blockquote>
+<p>  线程在操作数据时，如果一个线程从上到下操作过程不被中断，称之为是原子性的。如果被中断，那么是非原子性的。线程在执行过程中，需要依赖于cpu的执行权的，cpu是随机抢夺的。哪个线程抢到就由哪个执行。所以线程在执行代码过程中无法保证不被中断。</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">package com.qf;</span><br><span class="line"></span><br><span class="line">public class AtomicTest &#123;</span><br><span class="line">    private int i = 0;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) throws InterruptedException &#123;</span><br><span class="line">        AtomicTest atomicTest = new AtomicTest();</span><br><span class="line"></span><br><span class="line">        Thread threadA = new Thread(() -&gt; &#123;</span><br><span class="line">            for (int i = 0; i &lt; 10; i++) &#123;</span><br><span class="line">                atomicTest.i++;</span><br><span class="line">                try &#123;</span><br><span class="line">                    Thread.sleep(20);</span><br><span class="line">                &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        Thread threadB = new Thread(() -&gt; &#123;</span><br><span class="line">            for (int i = 0; i &lt; 10; i++) &#123;</span><br><span class="line">                atomicTest.i++;</span><br><span class="line">                try &#123;</span><br><span class="line">                    Thread.sleep(50);</span><br><span class="line">                &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        threadA.start();</span><br><span class="line">        threadB.start();</span><br><span class="line"></span><br><span class="line">        threadA.join();</span><br><span class="line">        threadB.join();</span><br><span class="line"></span><br><span class="line">        System.out.println(atomicTest.i);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="可见行"><a href="#可见行" class="headerlink" title="可见行"></a>可见行</h2><blockquote>
+<p>  由于JMM内存模型的原因，每个线程都有自己的工作内存，各个线程工作内存间的数据操作彼此是不可见的。</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">package com.qf;</span><br><span class="line"></span><br><span class="line">public class VisiableTest &#123;</span><br><span class="line">    boolean initFlag = false;</span><br><span class="line">    public void save()&#123;</span><br><span class="line">        this.initFlag = true;</span><br><span class="line">        String threadname = Thread.currentThread().getName();</span><br><span class="line">        System.out.println(&quot;线程：&quot;+threadname+&quot;:修改共享变量initFlag为true&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void load()&#123;</span><br><span class="line">        String threadname = Thread.currentThread().getName();</span><br><span class="line">        while (!initFlag)&#123;</span><br><span class="line">            //线程在此处空跑，等待initFlag状态改变</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(&quot;线程：&quot;+threadname+&quot;当前线程嗅探到initFlag的状态的改变&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    public static void main(String[] args)&#123;</span><br><span class="line">        VisiableTest sample = new VisiableTest();</span><br><span class="line">        Thread threadA = new Thread(()-&gt;&#123;</span><br><span class="line">            sample.save();</span><br><span class="line">        &#125;,&quot;threadA&quot;);</span><br><span class="line">        Thread threadB = new Thread(()-&gt;&#123;</span><br><span class="line">            sample.load();</span><br><span class="line">        &#125;,&quot;threadB&quot;);</span><br><span class="line">        threadB.start();</span><br><span class="line">        try &#123;</span><br><span class="line">            Thread.sleep(2000);</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        threadA.start();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="有序性"><a href="#有序性" class="headerlink" title="有序性"></a>有序性</h2><blockquote>
+<p>  编译器或者cpu执行过程中可能会发生编译重拍或者指令重拍。这种重排是编译器或者cpu内部针对执行过程进行的优化，单线程环境下，不管重排与否，最终都不能影响程序的执行结果（这个是由happens-before原则保障的），但是在多线程环境下，一旦重排就可能出现bug</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">package com.qf;</span><br><span class="line"></span><br><span class="line">public class SequenceTest &#123;</span><br><span class="line">    private volatile static int a,b,x,y;</span><br><span class="line">    public static void main(String[] args) throws InterruptedException &#123;</span><br><span class="line">        int i = 0;</span><br><span class="line">        while (true)&#123;</span><br><span class="line">            i++;</span><br><span class="line">            a = 0;</span><br><span class="line">            b = 0;</span><br><span class="line">            x = 0;</span><br><span class="line">            y = 0;</span><br><span class="line"></span><br><span class="line">            Thread t1 = new Thread(()-&gt;&#123;</span><br><span class="line">            try &#123;</span><br><span class="line">                        Thread.sleep(20);</span><br><span class="line">                    &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                        e.printStackTrace();</span><br><span class="line">                    &#125;</span><br><span class="line">                    a = 1;</span><br><span class="line">                    x = b;</span><br><span class="line">         &#125;);</span><br><span class="line"></span><br><span class="line">            Thread t2 = new Thread(()-&gt;&#123;</span><br><span class="line">            try &#123;</span><br><span class="line">                        Thread.sleep(20);</span><br><span class="line">                    &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                        e.printStackTrace();</span><br><span class="line">                    &#125;</span><br><span class="line">                    b = 1;</span><br><span class="line">                    y = a;</span><br><span class="line">         &#125;);</span><br><span class="line"></span><br><span class="line">            t1.start();</span><br><span class="line">            t2.start();</span><br><span class="line">            t1.join();</span><br><span class="line">            t2.join();</span><br><span class="line"></span><br><span class="line">            System.out.println(&quot;第&quot;+i+&quot;次执行: (x=&quot;+x+&quot;,y=&quot;+y+&quot;)&quot;);</span><br><span class="line"></span><br><span class="line">            if (x==0 &amp;&amp; y==0)&#123;</span><br><span class="line">                break;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="volatile"><a href="#volatile" class="headerlink" title="volatile"></a>volatile</h1><blockquote>
+<p>解决可见性和有序性，不能解决原子性</p>
+</blockquote>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>volatile修饰的变量生成汇编语言时，会在变量上添加lock前缀。</strong>计算机在执行这个汇编指令时，遇到lock前缀，一方面会触发<strong>缓存一致性协议</strong>，保证各个cpu中缓存的某个缓存行数据的一致性，从而<strong>保证</strong>多线程间数据的<strong>可见性</strong>；另一方面会基于<strong>内存屏障</strong>， 保证被volatile修饰的变量在编译、执行过程中不会被重排序，从而<strong>保证</strong>多线程执行过程中的程序<strong>有序性</strong>。</p>
+<h2 id="缓存一致性协议（MESI）"><a href="#缓存一致性协议（MESI）" class="headerlink" title="缓存一致性协议（MESI）"></a>缓存一致性协议（MESI）</h2><blockquote>
+<p>强制将最新修改同步到主存，并且强制其他cpu缓存更新最新的缓存行数据，从而保证数据一致（可见）</p>
+</blockquote>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/JMM-img/1665475931323.png" style="zoom:100%;" /></p>
+<blockquote>
+<p>M：修改（Modified）</p>
+<p>E：独享、互斥（Exclusive）</p>
+<p>S：共享（Shared）</p>
+<p>I：无效（Invalid）</p>
+<p>一个cpu加载缓存行进行数据缓存-E</p>
+</blockquote>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/JMM-img/1665326841636.png" style="zoom:100%;" /></p>
+<blockquote>
+<p>多个cpu加载缓存行进行数据缓存-S</p>
+</blockquote>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/JMM-img/1665327010486.png" style="zoom:100%;" /></p>
+<blockquote>
+<p>其中某个cpu中缓存行的数据发生改变-M，会导致其他cpu中该缓存行的数据无效-I</p>
+</blockquote>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/JMM-img/1665327015803.png" style="zoom:100%;" /></p>
+<blockquote>
+<p>修改缓存行数据后，同步到主存（M-&gt;S），其他cpu重新加载缓存行信息(I-&gt;S)</p>
+</blockquote>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/JMM-img/1665327072979.png" style="zoom:100%;" /></p>
+<h2 id="内存屏障"><a href="#内存屏障" class="headerlink" title="内存屏障"></a>内存屏障</h2><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;不同硬件实现内存屏障的方式不同，Java内存模型屏蔽了这种底层硬件平台的差异，由JVM来为不同的平台生成相应的机器码。 JVM中提供了四类内存屏障指令：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>屏障类型</th>
+<th>指令示例</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LoadLoad</td>
+<td>Load1; LoadLoad; Load2</td>
+<td>保证load1的读取操作在load2及后续读取操作之前执行</td>
+</tr>
+<tr>
+<td>StoreStore</td>
+<td>Store1; StoreStore; Store2</td>
+<td>在store2及其后的写操作执行前，保证store1的写操作已刷新到主内存</td>
+</tr>
+<tr>
+<td>LoadStore</td>
+<td>Load1; LoadStore; Store2</td>
+<td>在stroe2及其后的写操作执行前，保证load1的读操作已读取结束</td>
+</tr>
+<tr>
+<td>StoreLoad</td>
+<td>Store1; StoreLoad; Load2</td>
+<td>保证store1的写操作已刷新到主内存之后，load2及其后的读操作才能执行</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;内存屏障，又称内存栅栏，是一个CPU指令，它的作用有两个，一是保证特定操作的执行顺序，二是保证某些变量的内存可见性（利用该特性实现volatile的内存可见性）。由于编译器和处理器都能执行指令重排优化。如果在指令间插入一条Memory Barrier则会告诉编译器和CPU，不管什么指令都不能和这条Memory Barrier指令重排序，也就是说通过插入内存屏障禁止在内存屏障前后的指令执行重排序优化。Memory Barrier的另外一个作用是强制刷出线程工作内存中的数据到主存。总之，volatile变量正是通过内存屏障实现其在内存中的语义，即可见性和禁止重排优化。</p>
+<span class='p green'>volatile内存语义的实现：</span>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;前面提到过重排序分为编译器重排序和处理器重排序。为了实现volatile内存语义，JMM会分别限制这两种类型的重排序类型。下图是JMM针对编译器制定的volatile重排序规则表。</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>第一个操作</th>
+<th>第二个操作：普通读写</th>
+<th>第二个操作：volatile读</th>
+<th>第二个操作：volatile写</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>普通读写</td>
+<td>可以重排</td>
+<td>可以重排</td>
+<td>不可以重排</td>
+</tr>
+<tr>
+<td>volatile读</td>
+<td>不可以重排</td>
+<td>不可以重排</td>
+<td>不可以重排</td>
+</tr>
+<tr>
+<td>volatile写</td>
+<td>可以重排</td>
+<td>不可以重排</td>
+<td>不可以重排</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;举例来说，第二行最后一个单元格的意思是：在程序中，当第一个操作为普通变量的读或写时，如果第二个操作为volatile写，则编译器不能重排序这两个操作。从上图可以看出：</p>
+<ul>
+<li>当第二个操作是volatile写时，不管第一个操作是什么，都不能重排序。这个规则确保volatile写之前的操作不会被编译器重排序到volatile写之后。</li>
+<li>当第一个操作是volatile读时，不管第二个操作是什么，都不能重排序。这个规则确保volatile读之后的操作不会被编译器重排序到volatile读之前。</li>
+<li>当第一个操作是volatile写，第二个操作是volatile读或写时，不能重排序。</li>
+</ul>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;为了实现volatile的内存语义，编译器在生成字节码时，会在指令序列中插入内存屏障来禁止特定类型的处理器重排序。对于编译器来说，发现一个最优布置来最小化插入屏障的总数几乎不可能。为此，JMM采取保守策略。下面是基于保守策略的JMM内存屏障插入策略。</p>
+<ul>
+<li>在每个volatile写操作的前面插入一个StoreStore屏障。</li>
+<li>在每个volatile写操作的后面插入一个StoreLoad屏障。</li>
+<li>在每个volatile读操作的后面插入一个LoadLoad屏障。</li>
+<li>在每个volatile读操作的后面插入一个LoadStore屏障。</li>
+</ul>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;上述内存屏障插入策略非常保守，但它可以保证在任意处理器平台，任意的程序中都能得到正确的volatile内存语义。</p>
+<blockquote>
+<p>下面是保守策略下，volatile写插入内存屏障后生成的指令序列示意图</p>
+</blockquote>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/JMM-img/1665327871082.png" style="zoom:100%;" /></p>
+<blockquote>
+<p>下图是在保守策略下，volatile读插入内存屏障后生成的指令序列示意图</p>
+</blockquote>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/JMM-img/1665327933526.png" style="zoom:100%;" /></p>
+<hr>
+<h1 id="synchronized-amp-Lock锁"><a href="#synchronized-amp-Lock锁" class="headerlink" title="synchronized&amp;Lock锁"></a>synchronized&amp;Lock锁</h1><blockquote>
+<p>解决可见性、有序性和原子性</p>
+</blockquote>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;synchronized内置锁是一种对象锁(锁的是对象而非引用)，作用粒度是对象，可以用来实现对临界资源的同步互斥访问，该锁是可重入的。</p>
+<span class='p red'>加锁的方式：</span>
+<ul>
+<li><p>1、同步实例方法，锁是当前实例对象</p>
+</li>
+<li><p>2、同步类方法，锁是当前类对象</p>
+</li>
+<li><p>3、同步代码块，锁是括号里面的对象</p>
+</li>
+</ul>
+<h2 id="synchronized底层原理"><a href="#synchronized底层原理" class="headerlink" title="synchronized底层原理"></a>synchronized底层原理</h2><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;synchronized是基于JVM内置锁实现，通过内部对象Monitor(监视器锁)实现，基于进入与退出Monitor对象实现方法与代码块同步，监视器锁的实现依赖底层操作系统的Mutex lock（互斥锁）实现，它是一个重量级锁性能较低。当然，JVM内置锁在1.5之后版本做了重大的优化，如锁粗化（Lock Coarsening）、锁消除（Lock Elimination）、轻量级锁（Lightweight Locking）、偏向锁（Biased Locking）、适应性自旋（Adaptive Spinning）等技术来减少锁操作的开销，，内置锁的并发性能已经基本与Lock持平。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;synchronized关键字被编译成字节码后会翻译成monitorenter和monitorexit，这两条指令分别在同步块逻辑代码的起始位置与结束位置。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/JMM-img/1665328319498.png" style="zoom:100%;" /></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;每个同步对象都有一个自己的Monitor(监视器锁)，加锁过程如下图所示：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/JMM-img/1665328342272.png" style="zoom:100%;" /></p>
+<h2 id="Monitor监视器锁"><a href="#Monitor监视器锁" class="headerlink" title="Monitor监视器锁"></a>Monitor监视器锁</h2><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;任何一个对象都有一个Monitor与之关联，当且一个Monitor被持有后，它将处于锁定状态。Synchronized在JVM里的实现都是基于进入和退出Monitor对象来实现方法同步和代码块同步，虽然具体实现细节不一样，但是都可以通过成对的MonitorEnter和MonitorExit指令来实现。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;monitorenter：每个对象都是一个监视器锁（monitor）。当monitor被占用时就会处于锁定状态，线程执行monitorenter指令时尝试获取monitor的所有权，过程如下：</p>
+<ul>
+<li>如果monitor的进入数为0，则该线程进入monitor，然后将进入数设置为1，该线程即为monitor的所有者；</li>
+<li>如果线程已经占有该monitor，只是重新进入，则进入monitor的进入数加1；</li>
+<li>如果其他线程已经占用了monitor，则该线程进入阻塞状态，直到monitor的进入数为0，再重新尝试获取monitor的所有权；</li>
+</ul>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;monitorexit：执行monitorexit的线程必须是objectref所对应的monitor的所有者。指令执行时，monitor的进入数减1，如果减1后进入数为0，那线程退出monitor，不再是这个monitor的所有者。其他被这个monitor阻塞的线程可以尝试去获取这个 monitor 的所有权。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;monitorexit，指令出现了两次，第1次为同步正常退出释放锁；第2次为发生异步退出释放锁；</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;通过上面两段描述，我们应该能很清楚的看出Synchronized的实现原理，Synchronized的语义底层是通过一个monitor的对象来完成，其实wait/notify等方法也依赖于monitor对象，这就是为什么只有在同步的块或者方法中才能调用wait/notify等方法，否则会抛出java.lang.IllegalMonitorStateException的异常的原因。</p>
+<blockquote>
+<p>同步代码块</p>
+</blockquote>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/JMM-img/1665328500031.png" style="zoom:100%;" /></p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/JMM-img/1665328516909.png" style="zoom:100%;" /></p>
+<blockquote>
+<p>同步方法</p>
+</blockquote>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/JMM-img/1665328545244.png" style="zoom:100%;" /></p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/JMM-img/1665328559558.png" style="zoom:100%;" /></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;从编译的结果来看，方法的同步并没有通过指令 monitorenter 和 monitorexit 来完成（理论上其实也可以通过这两条指令来实现），不过相对于普通方法，其常量池中多了 ACC_SYNCHRONIZED 标示符。JVM就是根据该标示符来实现方法的同步的：</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;当方法调用时，调用指令将会检查方法的 ACC_SYNCHRONIZED 访问标志是否被设置，如果设置了，执行线程将先获取monitor，获取成功之后才能执行方法体，方法执行完后再释放monitor。在方法执行期间，其他任何线程都无法再获得同一个monitor对象。</p>
+<blockquote>
+<p><strong>两种同步方式本质上没有区别，只是方法的同步是一种隐式的方式来实现，无需通过字节码来完成</strong>。<strong>两个指令的执行是JVM通过调用操作系统的互斥原语mutex来实现，被阻塞的线程会被挂起、等待重新调度，会导致“用户态和内核态”两个态之间来回切换，对性能有较大影响。（jdk1.6开始进行了优化）</strong></p>
+</blockquote>
+<h2 id="什么是monitor？"><a href="#什么是monitor？" class="headerlink" title="什么是monitor？"></a>什么是monitor？</h2><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;可以把它理解为 一个同步工具，也可以描述为 一种同步机制，它通常被 描述为一个对象。与一切皆对象一样，所有的Java对象是天生的Monitor，每一个Java对象都有成为Monitor的潜质，因为在Java的设计中 ，每一个Java对象自打娘胎里出来就带了一把看不见的锁，它叫做内部锁或者Monitor锁。也就是通常说Synchronized的对象锁，MarkWord锁标识位为10，其中指针指向的是Monitor对象的起始地址。在Java虚拟机（HotSpot）中，Monitor是由ObjectMonitor实现的，其主要数据结构如下（位于HotSpot虚拟机源码ObjectMonitor.hpp文件，C++实现的）：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">ObjectMonitor</span>() &#123;</span><br><span class="line">    _header       = <span class="literal">NULL</span>;</span><br><span class="line">    _count        = <span class="number">0</span>; <span class="comment">// 记录个数</span></span><br><span class="line">    _waiters      = <span class="number">0</span>,</span><br><span class="line">    _recursions   = <span class="number">0</span>;</span><br><span class="line">    _object       = <span class="literal">NULL</span>;</span><br><span class="line">    _owner        = <span class="literal">NULL</span>; <span class="comment">//持锁线程</span></span><br><span class="line">    _WaitSet      = <span class="literal">NULL</span>; <span class="comment">// 处于wait状态的线程，会被加入到_WaitSet</span></span><br><span class="line">    _WaitSetLock  = <span class="number">0</span> ;</span><br><span class="line">    _Responsible  = <span class="literal">NULL</span> ;</span><br><span class="line">    _succ         = <span class="literal">NULL</span> ;</span><br><span class="line">    _cxq          = <span class="literal">NULL</span> ;</span><br><span class="line">    FreeNext      = <span class="literal">NULL</span> ;</span><br><span class="line">    _EntryList    = <span class="literal">NULL</span> ; <span class="comment">// 处于等待锁block状态的线程，会被加入到该列表</span></span><br><span class="line">    _SpinFreq     = <span class="number">0</span> ;</span><br><span class="line">    _SpinClock    = <span class="number">0</span> ;</span><br><span class="line">    OwnerIsThread = <span class="number">0</span> ;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>ObjectMonitor中有两个队列，_WaitSet 和 _EntryList，用来保存ObjectWaiter对象列表（ 每个等待锁的线程都会被封装成ObjectWaiter对象 ），_owner指向持有ObjectMonitor对象的线程，当多个线程同时访问一段同步代码时：</p>
+<ul>
+<li>首先会进入 _EntryList 集合，当线程获取到对象的monitor后，进入 _Owner区域并把monitor中的owner变量设置为当前线程，同时monitor中的计数器count加1；</li>
+<li>若线程调用 wait() 方法，将释放当前持有的monitor，owner变量恢复为null，count自减1，同时该线程进入 WaitSet集合中等待被唤醒；</li>
+<li>若当前线程执行完毕，也将释放monitor（锁）并复位count的值，以便其他线程进入获取monitor(锁)；</li>
+</ul>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;同时，Monitor对象存在于每个Java对象的对象头Mark Word中（存储的指针的指向），Synchronized锁便是通过这种方式获取锁的，也是为什么Java中任意对象可以作为锁的原因，同时notify/notifyAll/wait等方法会使用到Monitor锁对象，所以必须在同步代码块中使用。监视器Monitor有两种同步方式：互斥与协作。多线程环境下线程之间如果需要共享数据，需要解决互斥访问数据的问题，监视器可以确保监视器上的数据在同一时刻只会有一个线程在访问。</p>
+<div class="note info flat"><p>那么有个问题来了，我们知道synchronized加锁加在对象上，对象是如何记录锁状态的呢？答案是锁状态是被记录在每个对象的对象头（Mark Word）中。 </p>
+</div>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/JMM-img/1665329382328.png" style="zoom:100%;" /></p>
+<h2 id="锁膨胀过程"><a href="#锁膨胀过程" class="headerlink" title="锁膨胀过程"></a>锁膨胀过程</h2><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>锁的状态总共有四种，无锁状态、偏向锁、轻量级锁和重量级锁。</strong>随着锁的竞争，锁可以从偏向锁升级到轻量级锁，再升级的重量级锁，但是<strong>锁的升级是单向的，也就是说只能从低到高升级，不会出现锁的降级</strong>。从JDK 1.6 中默认是开启偏向锁和轻量级锁的，可以通过-XX:-UseBiasedLocking来禁用偏向锁。</p>
+<h3 id="无锁状态"><a href="#无锁状态" class="headerlink" title="无锁状态"></a>无锁状态</h3><h3 id="偏向锁"><a href="#偏向锁" class="headerlink" title="偏向锁"></a>偏向锁</h3><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;偏向锁是Java 6之后加入的新锁，它是一种针对加锁操作的优化手段，经过研究发现，在大多数情况下，锁不仅不存在多线程竞争，而且总是由同一线程多次获得，因此为了减少同一线程获取锁(会涉及到一些CAS操作,耗时)的代价而引入偏向锁。偏向锁的核心思想是，如果一个线程获得了锁，那么锁就进入偏向模式，此时Mark Word 的结构也变为偏向锁结构，当这个线程再次请求锁时，无需再做任何同步操作，即获取锁的过程，这样就省去了大量有关锁申请的操作，从而也就提供程序的性能。所以，对于没有锁竞争的场合，偏向锁有很好的优化效果，毕竟极有可能连续多次是同一个线程申请相同的锁。但是对于锁竞争比较激烈的场合，偏向锁就失效了，因为这样场合极有可能每次申请锁的线程都是不相同的，因此这种场合下不应该使用偏向锁，否则会得不偿失，需要注意的是，偏向锁失败后，并不会立即膨胀为重量级锁，而是先升级为轻量级锁。下面我们接着了解轻量级锁。</p>
+<blockquote>
+<p>默认开启偏向锁</p>
+<p>开启偏向锁：-XX:+UseBiasedLocking -XX:BiasedLockingStartupDelay=0</p>
+<p>关闭偏向锁：-XX:-UseBiasedLocking</p>
+</blockquote>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/JMM-img/1665543672291.png" style="zoom:100%;" /></p>
+<h3 id="轻量级锁"><a href="#轻量级锁" class="headerlink" title="轻量级锁"></a>轻量级锁</h3><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;倘若偏向锁失败，虚拟机并不会立即升级为重量级锁，它还会尝试使用一种称为轻量级锁的优化手段(1.6之后加入的)，此时Mark Word 的结构也变为轻量级锁的结构。轻量级锁能够提升程序性能的依据是“对绝大部分的锁，在整个同步周期内都不存在竞争”，注意这是经验数据。需要了解的是，轻量级锁所适应的场景是线程交替执行同步块的场合，如果存在同一时间访问同一锁的场合，就会导致轻量级锁膨胀为重量级锁。</p>
+<blockquote>
+<p>轻量级锁释放后，会变成无锁状态。</p>
+</blockquote>
+<h4 id="自旋锁"><a href="#自旋锁" class="headerlink" title="自旋锁"></a>自旋锁</h4><blockquote>
+<p>轻量级锁到重量级锁膨胀过程中的一个中间状态。不轻易在内核层面挂起线程。</p>
+</blockquote>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;轻量级锁失败后，虚拟机为了避免线程真实地在操作系统层面挂起，还会进行一项称为自旋锁的优化手段。这是基于在大多数情况下，线程持有锁的时间都不会太长，如果直接挂起操作系统层面的线程可能会得不偿失，毕竟操作系统实现线程之间的切换时需要从用户态转换到核心态，这个状态之间的转换需要相对比较长的时间，时间成本相对较高，因此自旋锁会假设在不久将来，当前的线程可以获得锁，因此虚拟机会让当前想要获取锁的线程做几个空循环(这也是称为自旋的原因)，一般不会太久，可能是50个循环或100循环，在经过若干次循环后，如果得到锁，就顺利进入临界区。如果还不能获得锁，那就会将线程在操作系统层面挂起，这就是自旋锁的优化方式，这种方式确实也是可以提升效率的。最后没办法也就只能升级为重量级锁了。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/JMM-img/1665544310192.png" style="zoom:100%;" /></p>
+<h3 id="重量级锁"><a href="#重量级锁" class="headerlink" title="重量级锁"></a>重量级锁</h3><blockquote>
+<p>在内核层面挂起线程，在monitor监视器对象中记录当前获取锁的线程对象，并且记录重试次数，其他等待线程也在monior对象的等待队列中进行记录保存。</p>
+</blockquote>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/JMM-img/1665544439556.png" style="zoom:100%;" /></p>
+<h2 id="锁消除"><a href="#锁消除" class="headerlink" title="锁消除"></a>锁消除</h2><blockquote>
+<p>基于逃逸分析，进行synchronized锁的优化</p>
+</blockquote>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;消除锁是虚拟机另外一种锁的优化，这种优化更彻底，Java虚拟机在JIT编译时(可以简单理解为当某段代码即将第一次被执行时进行编译，又称即时编译)，通过对运行上下文的扫描，去除不可能存在共享资源竞争的锁，通过这种方式消除没有必要的锁，可以节省毫无意义的请求锁时间，如下StringBuffer的append是一个同步方法，但是在add方法中的StringBuffer属于一个局部变量，并且不会被其他线程所使用，因此StringBuffer不可能存在共享资源竞争的情景，JVM会自动将其锁消除。锁消除的依据是逃逸分析的数据支持。</p>
+<p>锁消除，前提是java必须运行在server模式（server模式会比client模式作更多的优化），同时必须开启逃逸分析</p>
+<ul>
+<li><p>-XX:+DoEscapeAnalysis 开启逃逸分析</p>
+</li>
+<li><p>-XX:+EliminateLocks 表示开启锁消除。</p>
+</li>
+</ul>
+<h1 id="并发工具包"><a href="#并发工具包" class="headerlink" title="并发工具包"></a>并发工具包</h1><h2 id="Semaphore"><a href="#Semaphore" class="headerlink" title="Semaphore"></a>Semaphore</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line">    功能： 限流</span><br><span class="line"></span><br><span class="line">    10个人过山洞（10个线程），一次过两个。每次通过的时间2s（线程内部执行时间）</span><br><span class="line"> */</span><br><span class="line">public class Test1 &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line"></span><br><span class="line">        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(&quot;yyyy-MM-dd HH:mm:ss&quot;);</span><br><span class="line"></span><br><span class="line">        //先创建一个信号量对象</span><br><span class="line">        Semaphore semaphore = new Semaphore(2);</span><br><span class="line"></span><br><span class="line">        for (int i = 0; i &lt; 10; i++) &#123;</span><br><span class="line">            new Thread(()-&gt;&#123;</span><br><span class="line">                //模拟过山洞</span><br><span class="line">                try &#123;</span><br><span class="line">                    // 获取信号，能获取，就通过，不能获取，就等待</span><br><span class="line">                    semaphore.acquire();  //如果获取到了，程序就可以向下执行；如果获取不到，程序就会阻塞在这个位置</span><br><span class="line"></span><br><span class="line">                    Thread.sleep(2000);</span><br><span class="line">                    System.out.println(Thread.currentThread().getName() + &quot;通过山洞,通过的时间点为: &quot; + simpleDateFormat.format(new Date()));</span><br><span class="line"></span><br><span class="line">                &#125; catch (Exception e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;finally &#123;</span><br><span class="line">                    //归还信号</span><br><span class="line">                    semaphore.release();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;,(i+1)+&quot;号&quot;).start();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="CountDownLatch"><a href="#CountDownLatch" class="headerlink" title="CountDownLatch"></a>CountDownLatch</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line">    公司组织团建，坐大巴车（主线程）</span><br><span class="line">        （5个线程），5个人要求5个人都到齐之后，才一起出发</span><br><span class="line"> */</span><br><span class="line">public class Test2 &#123;</span><br><span class="line">    public static void main(String[] args) throws InterruptedException &#123;</span><br><span class="line">        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(&quot;yyyy-MM-dd HH:mm:ss&quot;);</span><br><span class="line">        CountDownLatch cdl = new CountDownLatch(5);</span><br><span class="line"></span><br><span class="line">        for (int i = 0; i &lt; 5; i++) &#123;</span><br><span class="line">            new Thread((i+1) + &quot;号员工&quot;)&#123;</span><br><span class="line">                @Override</span><br><span class="line">                public void run() &#123;</span><br><span class="line">                    int time = new Random().nextInt(2000);</span><br><span class="line">                    try &#123;</span><br><span class="line">                        Thread.sleep(500 + time);</span><br><span class="line">                    &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                        e.printStackTrace();</span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                    System.out.println(Thread.currentThread().getName() + &quot;到达，时间为：&quot; + simpleDateFormat.format(new Date()));</span><br><span class="line"></span><br><span class="line">                    cdl.countDown();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;.start();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        System.out.println(&quot;大巴车等待员工中.....,时间为:&quot; + simpleDateFormat.format(new Date()));</span><br><span class="line">        cdl.await();</span><br><span class="line"></span><br><span class="line">        System.out.println(&quot;所有人都到达，出发，时间为:&quot; + simpleDateFormat.format(new Date()));</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="CyclicBarrier"><a href="#CyclicBarrier" class="headerlink" title="CyclicBarrier"></a>CyclicBarrier</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line">    团建做闯关游戏</span><br><span class="line">        3个人一起闯关，三关，每一关要求所有人到达后，才能继续下一关</span><br><span class="line"> */</span><br><span class="line">public class Test3 &#123;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line"></span><br><span class="line">        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(&quot;yyyy-MM-dd HH:mm:ss&quot;);</span><br><span class="line">        CyclicBarrier cb = new CyclicBarrier(3);</span><br><span class="line"></span><br><span class="line">        for (int i = 0; i &lt; 3; i++) &#123;</span><br><span class="line">            new Thread(()-&gt;&#123;</span><br><span class="line">                int time = new Random().nextInt(2000);</span><br><span class="line">                try &#123;</span><br><span class="line">                    Thread.sleep(500 + time);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">                    System.out.println(Thread.currentThread().getName()+&quot;到达第一关，时间为：&quot; + simpleDateFormat.format(new Date()));</span><br><span class="line">                    //等待其他参与人员都到达后，才继续下一关</span><br><span class="line">                    cb.await();</span><br><span class="line"></span><br><span class="line">                    //所有人都到达这个位置后，可以重置标记</span><br><span class="line">                    cb.reset();</span><br><span class="line"></span><br><span class="line">                    //开始闯第二关</span><br><span class="line">                    time = new Random().nextInt(2000);</span><br><span class="line">                    Thread.sleep(500 + time);</span><br><span class="line">                    System.out.println(Thread.currentThread().getName()+&quot;到达第二关，时间为：&quot; + simpleDateFormat.format(new Date()));</span><br><span class="line">                    //等待其他参与人员都到达后，才继续下一关</span><br><span class="line">                    cb.await();</span><br><span class="line"></span><br><span class="line">                    //所有人都到达这个位置后，可以重置标记</span><br><span class="line">                    cb.reset();</span><br><span class="line"></span><br><span class="line">                    //开始闯第三关</span><br><span class="line">                    time = new Random().nextInt(2000);</span><br><span class="line">                    Thread.sleep(500 + time);</span><br><span class="line">                    System.out.println(Thread.currentThread().getName()+&quot;到达第三关，时间为：&quot; + simpleDateFormat.format(new Date()));</span><br><span class="line">                    //等待其他参与人员都到达后，才继续下一关</span><br><span class="line">                    cb.await();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">                    System.out.println(&quot;所有人都到达第三关，闯关结束....&quot;);</span><br><span class="line">                &#125; catch (Exception e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;,(i+1)+&quot;号员工&quot;).start();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="ConcurrentHashMap"><a href="#ConcurrentHashMap" class="headerlink" title="ConcurrentHashMap"></a>ConcurrentHashMap</h2><h2 id="CopyOnWriteArrayList"><a href="#CopyOnWriteArrayList" class="headerlink" title="CopyOnWriteArrayList"></a>CopyOnWriteArrayList</h2><blockquote>
+<p>写时复制，读多写少的时候使用</p>
+</blockquote>
+<h1 id="AQS"><a href="#AQS" class="headerlink" title="AQS"></a>AQS</h1><blockquote>
+<p><strong>AbstractQueuedSynchronizer</strong>: 抽象队列同步器</p>
+</blockquote>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/JMM-img/1665410445261.png" style="zoom:100%;" /></p>
+<hr>
+<h1 id="Atomic-amp-CAS"><a href="#Atomic-amp-CAS" class="headerlink" title="Atomic&amp;CAS"></a>Atomic&amp;CAS</h1><blockquote>
+<p>针对之前多线对共享变量执行i++的操作，如果不加锁的情况下，会出现最终得到的结果比预期的结果值会少的情况，当时我们解决这个问题的方案是加锁，但是在这种场景下，采用加锁（悲观锁）方案解决，代价相对比较昂贵，此时可以利用原子类（内部使用CAS-乐观锁）解决</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">public class AtomicIntegerTest &#123;</span><br><span class="line">    private AtomicInteger atomicInteger = new AtomicInteger(0);</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) throws InterruptedException &#123;</span><br><span class="line">        AtomicIntegerTest atomicIntegerTest = new AtomicIntegerTest();</span><br><span class="line"></span><br><span class="line">        Thread t1 = new Thread() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            public void run() &#123;</span><br><span class="line">                for (int i = 0; i &lt; 10; i++) &#123;</span><br><span class="line">                    try &#123;</span><br><span class="line">                        Thread.sleep(20);</span><br><span class="line">                    &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                        e.printStackTrace();</span><br><span class="line">                    &#125;</span><br><span class="line">                    atomicIntegerTest.atomicInteger.incrementAndGet();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">        t1.start();</span><br><span class="line"></span><br><span class="line">        Thread t2 = new Thread() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            public void run() &#123;</span><br><span class="line">                for (int i = 0; i &lt; 10; i++) &#123;</span><br><span class="line">                    try &#123;</span><br><span class="line">                        Thread.sleep(20);</span><br><span class="line">                    &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                        e.printStackTrace();</span><br><span class="line">                    &#125;</span><br><span class="line">                    atomicIntegerTest.atomicInteger.incrementAndGet();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">        t2.start();</span><br><span class="line"></span><br><span class="line">        t1.join();</span><br><span class="line">        t2.join();</span><br><span class="line"></span><br><span class="line">        System.out.println(atomicIntegerTest.atomicInteger.get());</span><br><span class="line"></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="CAS-自旋（乐观锁）"><a href="#CAS-自旋（乐观锁）" class="headerlink" title="CAS+自旋（乐观锁）"></a>CAS+自旋（乐观锁）</h2><p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/JMM-img/1665413804103.png" style="zoom:100%;" /></p>
+<h2 id="ABA问题"><a href="#ABA问题" class="headerlink" title="ABA问题"></a>ABA问题</h2><p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/JMM-img/1665414178249.png" style="zoom:100%;" /></p>
+<blockquote>
+<p>添加版本号解决ABA问题，通过版本号记录内存中数据的变化过程，没变化一次，版本号就递增1</p>
+</blockquote>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/JMM-img/1665561935548.png" style="zoom:100%;" /></p>
+<hr>
+<h1 id="线程池"><a href="#线程池" class="headerlink" title="线程池"></a>线程池</h1><h2 id="七大参数"><a href="#七大参数" class="headerlink" title="七大参数"></a>七大参数</h2><ul>
+<li>核心线程数</li>
+<li>最大线程数</li>
+<li>存活时间</li>
+<li>存活时间单位</li>
+<li>线程工厂</li>
+<li>任务队列</li>
+<li>拒绝策略</li>
+</ul>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/JMM-img/1665413356942.png" style="zoom:100%;" /></p>
+<h2 id="五大状态"><a href="#五大状态" class="headerlink" title="五大状态"></a>五大状态</h2><span class='p blue'>能接收新提交的任务，也能处理阻塞队列中的任务；</span>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;private static final int RUNNING    = -1 &lt;&lt; COUNT_BITS;</p>
+<span class='p blue'>关闭状态，不再接收新提交的任务，但却可以继续处理阻塞队列中已保存的消息 (shutdown())</span>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;private static final int SHUTDOWN   =  0 &lt;&lt; COUNT_BITS;</p>
+<span class='p blue'>不接受任务，也不处理阻塞队列中的消息，会中断正在执行的任务 (shutdownNow())</span>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;private static final int STOP       =  1 &lt;&lt; COUNT_BITS;</p>
+<span class='p blue'>所有的任务已终止，workerCount(有效线程数为0）；</span>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;private static final int TIDYING    =  2 &lt;&lt; COUNT_BITS;</p>
+<span class='p blue'>在terminated()方法执行完后进入该状态(terminated())</span>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;private static final int TERMINATED =  3 &lt;&lt; COUNT_BITS;</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/JMM-img/1665412815441.png" style="zoom:100%;" /></p>
+<h2 id="Worker"><a href="#Worker" class="headerlink" title="Worker"></a>Worker</h2><blockquote>
+<p>private final class Worker extends AbstractQueuedSynchronizer implements Runnable</p>
+<p>Worker内部封装了线程对象，为了保证线程执行任务时的并发安全，它本身是一个AQS同步器。同时也是一个Runnable，封装线程执行的任务。</p>
+<p>Worker对象被创建后，线程池会将worker中的线程对象启动，这个线程采用while循环方式，从等待队列中获取任务进行代码执行。</p>
+</blockquote>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/JMM-img/1665564895787.png" style="zoom:100%;" /></p>
+<blockquote>
+<p>任务执行失败后，会捕获异常，同时又将异常抛出，最终会执行到finally代码块中，在这个代码块中，会将这个线程停止，同时将对应的worker移除，同时判断线程池的状态是否是RUNNING或者SHUTDOWN，如果是，重新创建新的worker，处理队列中的任务。</p>
+</blockquote>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/JMM-img/1665565175328.png" style="zoom:100%;" /></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://github.com/Ginkgovio/Ginkgovio-Blog.github.io.git">Ginkgovio</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://github.com/2023/06/04/JMM-01/">https://github.com/2023/06/04/JMM-01/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://github.com" target="_blank">Ginkgovio-Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/JMM/">JMM</a><a class="post-meta__tags" href="/tags/Java/">Java</a></div><div class="post_share"><div class="social-share" data-image="/img/lunbo-09.jpg" data-sites="facebook,twitter,wechat,qq"></div><link rel="stylesheet" href="https://lib.baomitu.com/social-share.js/1.0.16/css/share.min.css" media="print" onload="this.media='all'"><script src="https://lib.baomitu.com/social-share.js/1.0.16/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/06/04/JVM-02/" title="JVM专项-第二篇"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/lunbo-12.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">JVM专项-第二篇</div></div></a></div><div class="next-post pull-right"><a href="/2023/06/04/Mysql-01/" title="mysql专项"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/lunbo-08.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">mysql专项</div></div></a></div></nav><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="waline-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="author_top is-center"><div class="card-info-avatar"><div class="avatar-img"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/assets/gk-01.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-status-box"><div class="author-status"><g-emoji class="g-emoji" alias="palm_tree" fallback-src="https://lskypro.acozycotage.net/LightPicture/2022/12/fe1dc0402e623096.jpg">🐟</g-emoji><span>认真摸鱼中</span></div></div></div><!--.avatar-imgimg(src=url_for(theme.avatar.img) onerror=`this.onerror=null;this.src='` + url_for(theme.error_img.flink) + `'` alt="avatar")--><div class="author-info__name">Ginkgovio</div><div class="author-info__description">疯了吧喜欢二次元</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">12</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">8</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><a id="card-info-btn" href="https://github.com/Ginkgovio/Ginkgovio-Blog.github.io.git"><i class="fab fa-github"></i><span>⚓前往ONE PIECE...</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/Ginkgovio-Blog.github.io" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:2511842759@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">欢迎各位拜访寒舍！</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#JMM"><span class="toc-number">1.</span> <span class="toc-text">JMM</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%A4%9A%E7%BA%BF%E7%A8%8B%E9%97%AE%E9%A2%98"><span class="toc-number">2.</span> <span class="toc-text">多线程问题</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8E%9F%E5%AD%90%E6%80%A7"><span class="toc-number">2.1.</span> <span class="toc-text">原子性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%AF%E8%A7%81%E8%A1%8C"><span class="toc-number">2.2.</span> <span class="toc-text">可见行</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%89%E5%BA%8F%E6%80%A7"><span class="toc-number">2.3.</span> <span class="toc-text">有序性</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#volatile"><span class="toc-number">3.</span> <span class="toc-text">volatile</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BC%93%E5%AD%98%E4%B8%80%E8%87%B4%E6%80%A7%E5%8D%8F%E8%AE%AE%EF%BC%88MESI%EF%BC%89"><span class="toc-number">3.1.</span> <span class="toc-text">缓存一致性协议（MESI）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E5%B1%8F%E9%9A%9C"><span class="toc-number">3.2.</span> <span class="toc-text">内存屏障</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#synchronized-amp-Lock%E9%94%81"><span class="toc-number">4.</span> <span class="toc-text">synchronized&amp;Lock锁</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#synchronized%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86"><span class="toc-number">4.1.</span> <span class="toc-text">synchronized底层原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Monitor%E7%9B%91%E8%A7%86%E5%99%A8%E9%94%81"><span class="toc-number">4.2.</span> <span class="toc-text">Monitor监视器锁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFmonitor%EF%BC%9F"><span class="toc-number">4.3.</span> <span class="toc-text">什么是monitor？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%94%81%E8%86%A8%E8%83%80%E8%BF%87%E7%A8%8B"><span class="toc-number">4.4.</span> <span class="toc-text">锁膨胀过程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%97%A0%E9%94%81%E7%8A%B6%E6%80%81"><span class="toc-number">4.4.1.</span> <span class="toc-text">无锁状态</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%81%8F%E5%90%91%E9%94%81"><span class="toc-number">4.4.2.</span> <span class="toc-text">偏向锁</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BD%BB%E9%87%8F%E7%BA%A7%E9%94%81"><span class="toc-number">4.4.3.</span> <span class="toc-text">轻量级锁</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%87%AA%E6%97%8B%E9%94%81"><span class="toc-number">4.4.3.1.</span> <span class="toc-text">自旋锁</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%87%8D%E9%87%8F%E7%BA%A7%E9%94%81"><span class="toc-number">4.4.4.</span> <span class="toc-text">重量级锁</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%94%81%E6%B6%88%E9%99%A4"><span class="toc-number">4.5.</span> <span class="toc-text">锁消除</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B9%B6%E5%8F%91%E5%B7%A5%E5%85%B7%E5%8C%85"><span class="toc-number">5.</span> <span class="toc-text">并发工具包</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Semaphore"><span class="toc-number">5.1.</span> <span class="toc-text">Semaphore</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CountDownLatch"><span class="toc-number">5.2.</span> <span class="toc-text">CountDownLatch</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CyclicBarrier"><span class="toc-number">5.3.</span> <span class="toc-text">CyclicBarrier</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ConcurrentHashMap"><span class="toc-number">5.4.</span> <span class="toc-text">ConcurrentHashMap</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CopyOnWriteArrayList"><span class="toc-number">5.5.</span> <span class="toc-text">CopyOnWriteArrayList</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#AQS"><span class="toc-number">6.</span> <span class="toc-text">AQS</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Atomic-amp-CAS"><span class="toc-number">7.</span> <span class="toc-text">Atomic&amp;CAS</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#CAS-%E8%87%AA%E6%97%8B%EF%BC%88%E4%B9%90%E8%A7%82%E9%94%81%EF%BC%89"><span class="toc-number">7.1.</span> <span class="toc-text">CAS+自旋（乐观锁）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ABA%E9%97%AE%E9%A2%98"><span class="toc-number">7.2.</span> <span class="toc-text">ABA问题</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E6%B1%A0"><span class="toc-number">8.</span> <span class="toc-text">线程池</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83%E5%A4%A7%E5%8F%82%E6%95%B0"><span class="toc-number">8.1.</span> <span class="toc-text">七大参数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E5%A4%A7%E7%8A%B6%E6%80%81"><span class="toc-number">8.2.</span> <span class="toc-text">五大状态</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Worker"><span class="toc-number">8.3.</span> <span class="toc-text">Worker</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2023/06/04/JVM-04/" title="JVM专项-第四篇"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/lunbo-10.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="JVM专项-第四篇"/></a><div class="content"><a class="title" href="/2023/06/04/JVM-04/" title="JVM专项-第四篇">JVM专项-第四篇</a><time datetime="2023-06-04T15:00:00.000Z" title="发表于 2023-06-04 23:00:00">2023-06-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/06/04/JVM-03/" title="JVM专项-第三篇"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/lunbo-11.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="JVM专项-第三篇"/></a><div class="content"><a class="title" href="/2023/06/04/JVM-03/" title="JVM专项-第三篇">JVM专项-第三篇</a><time datetime="2023-06-04T11:00:00.000Z" title="发表于 2023-06-04 19:00:00">2023-06-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/06/04/JVM-02/" title="JVM专项-第二篇"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/lunbo-12.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="JVM专项-第二篇"/></a><div class="content"><a class="title" href="/2023/06/04/JVM-02/" title="JVM专项-第二篇">JVM专项-第二篇</a><time datetime="2023-06-04T10:00:00.000Z" title="发表于 2023-06-04 18:00:00">2023-06-04</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2023 By Ginkgovio</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button><button class="share" type="button" title="右键模式" onclick="changeMouseMode()"><i class="fas fa-mouse"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button class="share" type="button" title="分享链接" onclick="share()"><i class="fas fa-share-node"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button><button id="go-down" type="button" title="直达底部" onclick="btf.scrollToDest(document.body.scrollHeight, 500)"><i class="fas fa-arrow-down"></i></button></div></div><div class="js-pjax" id="rightMenu"><div class="rightMenu-group rightMenu-small"><a class="rightMenu-item" href="javascript:window.history.back();"><i class="fa fa-arrow-left"></i></a><a class="rightMenu-item" href="javascript:window.history.forward();"><i class="fa fa-arrow-right"></i></a><a class="rightMenu-item" href="javascript:window.location.reload();"><i class="fa fa-refresh"></i></a><a class="rightMenu-item" href="javascript:rmf.scrollToTop();"><i class="fa fa-arrow-up"></i></a></div><div class="rightMenu-group rightMenu-line hide" id="menu-text"><a class="rightMenu-item" href="javascript:rmf.copySelect();"><i class="fa fa-copy"></i><span>复制</span></a><a class="rightMenu-item" href="javascript:window.open(&quot;https://www.google.com/webhp/s?wd=&quot;+window.getSelection().toString());window.location.reload();"><i class="fa fa-search"></i><span>谷歌搜索</span></a></div><div class="rightMenu-group rightMenu-line hide" id="menu-too"><a class="rightMenu-item" href="javascript:window.open(window.getSelection().toString());window.location.reload();"><i class="fa fa-link"></i><span>转到链接</span></a></div><div class="rightMenu-group rightMenu-line hide" id="menu-paste"><a class="rightMenu-item" href="javascript:rmf.paste()"><i class="fa fa-copy"></i><span>粘贴</span></a></div><div class="rightMenu-group rightMenu-line hide" id="menu-post"><a class="rightMenu-item" href="#post-comment"><i class="fas fa-comment"></i><span>空降评论</span></a><a class="rightMenu-item" href="javascript:rmf.copyWordsLink()"><i class="fa fa-link"></i><span>复制本文地址</span></a></div><div class="rightMenu-group rightMenu-line hide" id="menu-to"><a class="rightMenu-item" href="javascript:rmf.openWithNewTab()"><i class="fa fa-window-restore"></i><span>新窗口打开</span></a><a class="rightMenu-item" id="menu-too" href="javascript:rmf.open()"><i class="fa fa-link"></i><span>转到链接</span></a><a class="rightMenu-item" href="javascript:rmf.copyLink()"><i class="fa fa-copy"></i><span>复制链接</span></a></div><div class="rightMenu-group rightMenu-line hide" id="menu-img"><a class="rightMenu-item" href="javascript:rmf.saveAs()"><i class="fa fa-download"></i><span>保存图片</span></a><a class="rightMenu-item" href="javascript:rmf.openWithNewTab()"><i class="fa fa-window-restore"></i><span>在新窗口打开</span></a><a class="rightMenu-item" href="javascript:rmf.copyLink()"><i class="fa fa-copy"></i><span>复制图片链接</span></a></div><div class="rightMenu-group rightMenu-line"><a class="rightMenu-item" href="javascript:randomPost()"><i class="fa fa-paper-plane"></i><span>随便逛逛</span></a><!--a.rightMenu-item(href="javascript:switchNightMode();")i.fa.fa-moon
+span='昼夜切换'--><a class="rightMenu-item" href="/personal/about/"><i class="fa fa-info-circle"></i><span>关于博客</span></a><!--a.rightMenu-item(href="javascript:toggleWinbox();")i.fas.fa-cog
+span='美化设置'--><a class="rightMenu-item" href="javascript:rmf.fullScreen();"><i class="fas fa-expand"></i><span>切换全屏</span></a><a class="rightMenu-item" href="javascript:window.print();"><i class="fa-solid fa-print"></i><span>打印页面</span></a></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.17/fancybox/fancybox.umd.min.js"></script><script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/instant.page/5.1.0/instantpage.min.js" type="module"></script><script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/vanilla-lazyload/17.3.1/lazyload.iife.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/node-snackbar/0.1.16/snackbar.min.js"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('https://cdnjs.cloudflare.com/ajax/libs/pangu/4.0.7/pangu.min.js')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
+
+function panguInit () {
+  if (true){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit)</script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"]],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.1
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, ''],
+        insertScript: [200, () => {
+          document.querySelectorAll('mjx-container').forEach(node => {
+            if (node.hasAttribute('display')) {
+              btf.wrap(node, 'div', { class: 'mathjax-overflow' })
+            } else {
+              btf.wrap(node, 'span', { class: 'mathjax-overflow' })
+            }
+          });
+        }, '', false]
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typesetPromise()
+}</script><script>function loadWaline () {
+  function initWaline () {
+    const waline = Waline.init(Object.assign({
+      el: '#waline-wrap',
+      serverURL: 'lean-clound-comments.vercel.app',
+      pageview: false,
+      dark: 'html[data-theme="dark"]',
+      path: window.location.pathname,
+      comment: false,
+    }, null))
+  }
+
+  const walineCSSLoad = document.getElementById('waline-css')
+
+  if (typeof Waline === 'object') {
+    walineCSSLoad ? initWaline() : getCSS('https://cdnjs.cloudflare.com/ajax/libs/waline/2.15.4/waline.min.css','waline-css').then(initWaline)
+  }
+  else {
+    getCSS('https://cdnjs.cloudflare.com/ajax/libs/waline/2.15.4/waline.min.css','waline-css').then(() => {
+      getScript('https://cdnjs.cloudflare.com/ajax/libs/waline/2.15.4/waline.min.js').then(initWaline)
+    })
+  }
+}
+
+if ('Waline' === 'Waline' || !false) {
+  if (false) btf.loadComment(document.getElementById('waline-wrap'),loadWaline)
+  else setTimeout(loadWaline, 0)
+} else {
+  function loadOtherComment () {
+    loadWaline()
+  }
+}</script></div><canvas id="universe"></canvas><script defer src="/js/universe.js"></script><script defer src="/js/cursor.js"></script><script defer data-pjax src="/js/emoji.js"></script><script src="https://cdn.bootcdn.net/ajax/libs/clipboard.js/2.0.11/clipboard.min.js"></script><script src="/js/share.js"></script><script type="text/javascript" src="https://cdn1.tianli0.top/npm/jquery@latest/dist/jquery.min.js"></script><script type="text/javascript" src="/js/rightmenu.js"></script><script async src="https://cdn1.tianli0.top/npm/vue@2.6.14/dist/vue.min.js"></script><script async src="https://cdn1.tianli0.top/npm/element-ui@2.15.6/lib/index.js"></script><script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/clipboard.js/2.0.11/clipboard.js"></script><script type="text/javascript" src="/js/rightmenu.js"></script><script src="/js/randomPost.js"></script><script defer="defer" id="fluttering_ribbon" mobile="true" src="https://cdnjs.cloudflare.com/ajax/libs/butterfly-extsrc/1.1.3/canvas-fluttering-ribbon.min.js"></script><script id="click-heart" src="https://cdnjs.cloudflare.com/ajax/libs/butterfly-extsrc/1.1.3/click-heart.min.js" async="async" mobile="false"></script><link rel="stylesheet" href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/aplayer/1.10.1/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/aplayer/1.10.1/APlayer.min.js"></script><script src="https://cdn1.tianli0.top/npm/js-heo@1.0.12/metingjs/Meting.min.js"></script><script src="https://lib.baomitu.com/pjax/0.2.8/pjax.min.js"></script><script>let pjaxSelectors = ["head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:send', function () {
+
+  // removeEventListener scroll 
+  window.tocScrollFn && window.removeEventListener('scroll', window.tocScrollFn)
+  window.scrollCollect && window.removeEventListener('scroll', scrollCollect)
+
+  document.getElementById('rightside').style.cssText = "opacity: ''; transform: ''"
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+
+  typeof disqusjs === 'object' && disqusjs.destroy()
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof chatBtnFn === 'function' && chatBtnFn()
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+})
+
+document.addEventListener('pjax:error', (e) => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div class="no-result" id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div><!-- hexo injector body_end start --> <script data-pjax>if(document.getElementById('recent-posts') && (location.pathname ==='/'|| '/' ==='all')){
+    var parent = document.getElementById('recent-posts');
+    var child = '<div class="recent-post-item" style="width:100%;height: auto"><div id="catalog_magnet"><div class="magnet_item"><a class="magnet_link" href="https://github.com/categories/C/"><div class="magnet_link_context" style=""><span style="font-weight:500;flex:1">👨‍🚀 Cの从入门到入土 (1)</span><span style="padding:0px 4px;border-radius: 8px;"><i class="fas fa-arrow-circle-right"></i></span></div></a></div><div class="magnet_item"><a class="magnet_link" href="https://github.com/categories/Java/"><div class="magnet_link_context" style=""><span style="font-weight:500;flex:1">🐱‍👓 Javaの从入门到转行 (6)</span><span style="padding:0px 4px;border-radius: 8px;"><i class="fas fa-arrow-circle-right"></i></span></div></a></div><div class="magnet_item"><a class="magnet_link" href="https://github.com/categories/计算机组成原理/"><div class="magnet_link_context" style=""><span style="font-weight:500;flex:1">🚀 带你走进底层的世界 (1)</span><span style="padding:0px 4px;border-radius: 8px;"><i class="fas fa-arrow-circle-right"></i></span></div></a></div><div class="magnet_item"><a class="magnet_link" href="https://github.com/categories/计算机网络/"><div class="magnet_link_context" style=""><span style="font-weight:500;flex:1">👩‍💻 想当黑客不？ (1)</span><span style="padding:0px 4px;border-radius: 8px;"><i class="fas fa-arrow-circle-right"></i></span></div></a></div><a class="magnet_link_more"  href="https://github.com/categories" style="flex:1;text-align: center;margin-bottom: 10px;">查看更多...</a></div></div>';
+    console.log('已挂载magnet')
+    parent.insertAdjacentHTML("afterbegin",child)}
+     </script><style>#catalog_magnet{flex-wrap: wrap;display: flex;width:100%;justify-content:space-between;padding: 10px 10px 0 10px;align-content: flex-start;}.magnet_item{flex-basis: calc(50% - 5px);background: #f2f2f2;margin-bottom: 10px;border-radius: 8px;transition: all 0.2s ease-in-out;}.magnet_item:hover{background: #69e8f2}.magnet_link_more{color:#555}.magnet_link{color:black}.magnet_link:hover{color:white}@media screen and (max-width: 600px) {.magnet_item {flex-basis: 100%;}}.magnet_link_context{display:flex;padding: 10px;font-size:16px;transition: all 0.2s ease-in-out;}.magnet_link_context:hover{padding: 10px 20px;}</style>
+    <style></style><script data-pjax>
+    function butterfly_categories_card_injector_config(){
+      var parent_div_git = document.getElementById('recent-posts');
+      var item_html = '<style>li.categoryBar-list-item{width:32.3%;}.categoryBar-list{max-height: 190px;overflow:auto;}.categoryBar-list::-webkit-scrollbar{width:0!important}@media screen and (max-width: 650px){.categoryBar-list{max-height: 160px;}}</style><div class="recent-post-item" style="height:auto;width:100%;padding:0px;"><div id="categoryBar"><ul class="categoryBar-list"><li class="categoryBar-list-item" style="background:url(/img/fl-01.jpg);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/C/&quot;);" href="javascript:void(0);">C</a><span class="categoryBar-list-count">1</span><span class="categoryBar-list-descr"></span></li><li class="categoryBar-list-item" style="background:url(/img/fl-02.jpg);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/CPP/&quot;);" href="javascript:void(0);">CPP</a><span class="categoryBar-list-count">1</span><span class="categoryBar-list-descr"></span></li><li class="categoryBar-list-item" style="background:url(/img/fl-03.jpg);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/Java/&quot;);" href="javascript:void(0);">Java</a><span class="categoryBar-list-count">6</span><span class="categoryBar-list-descr"></span></li><li class="categoryBar-list-item" style="background:url(/img/fl-04.jpg);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/myql/&quot;);" href="javascript:void(0);">myql</a><span class="categoryBar-list-count">1</span><span class="categoryBar-list-descr"></span></li><li class="categoryBar-list-item" style="background:url(/img/fl-05.jpg);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/计算机组成原理/&quot;);" href="javascript:void(0);">计算机组成原理</a><span class="categoryBar-list-count">1</span><span class="categoryBar-list-descr"></span></li><li class="categoryBar-list-item" style="background:url(/img/fl-06.jpg);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/计算机网络/&quot;);" href="javascript:void(0);">计算机网络</a><span class="categoryBar-list-count">1</span><span class="categoryBar-list-descr"></span></li></ul></div></div>';
+      console.log('已挂载butterfly_categories_card')
+      parent_div_git.insertAdjacentHTML("afterbegin",item_html)
+      }
+    if( document.getElementById('recent-posts') && (location.pathname ==='/'|| '/' ==='all')){
+    butterfly_categories_card_injector_config()
+    }
+  </script><script data-pjax>
+  function butterfly_footer_beautify_injector_config(){
+    var parent_div_git = document.getElementById('footer-wrap');
+    var item_html = '<div id="workboard"></div><p id="ghbdages"><a class="github-badge" target="_blank" href="https://hexo.io/" style="margin-inline:5px" data-title="博客框架为Hexo_v6.3.0" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Frame-Hexo-blue?style=flat&amp;logo=hexo" alt=""/></a><a class="github-badge" target="_blank" href="https://butterfly.js.org/" style="margin-inline:5px" data-title="主题版本Butterfly_v4.8.5" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Theme-Butterfly-6513df?style=flat&amp;logo=bitdefender" alt=""/></a><a class="github-badge" target="_blank" href="https://vercel.com/" style="margin-inline:5px" data-title="本站采用多线部署，主线路托管于Vercel" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Hosted-Vercel-brightgreen?style=flat&amp;logo=Vercel" alt=""/></a><a class="github-badge" target="_blank" href="https://dashboard.4everland.org/" style="margin-inline:5px" data-title="本站采用多线部署，备用线路托管于4EVERLAND" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Hosted-4EVERLAND-22DDDD?style=flat&amp;logo=IPFS" alt=""/></a><a class="github-badge" target="_blank" href="https://github.com/" style="margin-inline:5px" data-title="本站项目由Github托管" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Source-Github-d021d6?style=flat&amp;logo=GitHub" alt=""/></a><a class="github-badge" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" style="margin-inline:5px" data-title="本站采用知识共享署名-非商业性使用-相同方式共享4.0国际许可协议进行许可" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Copyright-BY--NC--SA%204.0-d42328?style=flat&amp;logo=Claris" alt=""/></a></p>';
+    console.log('已挂载butterfly_footer_beautify')
+    parent_div_git.insertAdjacentHTML("beforeend",item_html)
+    }
+  var elist = 'null'.split(',');
+  var cpage = location.pathname;
+  var epage = 'all';
+  var flag = 0;
+
+  for (var i=0;i<elist.length;i++){
+    if (cpage.includes(elist[i])){
+      flag++;
+    }
+  }
+
+  if ((epage ==='all')&&(flag == 0)){
+    butterfly_footer_beautify_injector_config();
+  }
+  else if (epage === cpage){
+    butterfly_footer_beautify_injector_config();
+  }
+  </script><script async src="/js/runtime.js"></script><script data-pjax>
+  function butterfly_swiper_injector_config(){
+    var parent_div_git = document.getElementById('recent-posts');
+    var item_html = '<div class="recent-post-item" style="height: auto;width: 100%"><div class="blog-slider swiper-container-fade swiper-container-horizontal" id="swiper_container"><div class="blog-slider__wrp swiper-wrapper" style="transition-duration: 0ms;"><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;2023/06/04/Mysql-01/&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/lunbo-08.jpg" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2023-06-04</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;2023/06/04/Mysql-01/&quot;);" href="javascript:void(0);" alt="">mysql专项</a><div class="blog-slider__text">mysql引擎区别以及分布式事务</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;2023/06/04/Mysql-01/&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;2023/06/03/计算机网络-01/&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/lunbo-13.jpg" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2023-06-03</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;2023/06/03/计算机网络-01/&quot;);" href="javascript:void(0);" alt="">计算机网络简介</a><div class="blog-slider__text">黑客的必备常识</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;2023/06/03/计算机网络-01/&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;2023/06/04/JVM-04/&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/lunbo-10.jpg" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2023-06-04</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;2023/06/04/JVM-04/&quot;);" href="javascript:void(0);" alt="">JVM专项-第四篇</a><div class="blog-slider__text">JAVA虚拟机</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;2023/06/04/JVM-04/&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;2023/06/04/JVM-03/&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/lunbo-11.jpg" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2023-06-04</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;2023/06/04/JVM-03/&quot;);" href="javascript:void(0);" alt="">JVM专项-第三篇</a><div class="blog-slider__text">JAVA虚拟机</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;2023/06/04/JVM-03/&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;2023/06/04/JVM-02/&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/lunbo-12.jpg" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2023-06-04</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;2023/06/04/JVM-02/&quot;);" href="javascript:void(0);" alt="">JVM专项-第二篇</a><div class="blog-slider__text">JAVA虚拟机</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;2023/06/04/JVM-02/&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;2023/06/04/JMM-01/&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/lunbo-09.jpg" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2023-06-04</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;2023/06/04/JMM-01/&quot;);" href="javascript:void(0);" alt="">JMM专项</a><div class="blog-slider__text">JAVA内存模型</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;2023/06/04/JMM-01/&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;2023/06/03/JVM-01/&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/lunbo-15.jpg" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2023-06-03</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;2023/06/03/JVM-01/&quot;);" href="javascript:void(0);" alt="">JVM专项-第一篇</a><div class="blog-slider__text">JAVA虚拟机</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;2023/06/03/JVM-01/&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;2023/06/03/CPP-01/&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/lunbo-03.jpg" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2023-06-03</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;2023/06/03/CPP-01/&quot;);" href="javascript:void(0);" alt="">C++语言简介</a><div class="blog-slider__text">C++语言支持C语言的绝大部分语法，除了C中的枚举</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;2023/06/03/CPP-01/&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;2023/06/03/C-01/&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/lunbo-16.jpg" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2023-06-03</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;2023/06/03/C-01/&quot;);" href="javascript:void(0);" alt="">C语言简介</a><div class="blog-slider__text">C语言是现在所有高级语言的鼻祖，没有C就没有现在的高级语言</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;2023/06/03/C-01/&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;2023/06/02/2023-6-2-firstpage/&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/lunbo-02.jpg" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2023-06-02</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;2023/06/02/2023-6-2-firstpage/&quot;);" href="javascript:void(0);" alt="">第一篇文章</a><div class="blog-slider__text">人生第一次</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;2023/06/02/2023-6-2-firstpage/&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div></div><div class="blog-slider__pagination swiper-pagination-clickable swiper-pagination-bullets"></div></div></div>';
+    console.log('已挂载butterfly_swiper')
+    parent_div_git.insertAdjacentHTML("afterbegin",item_html)
+    }
+  var elist = 'undefined'.split(',');
+  var cpage = location.pathname;
+  var epage = '/';
+  var flag = 0;
+
+  for (var i=0;i<elist.length;i++){
+    if (cpage.includes(elist[i])){
+      flag++;
+    }
+  }
+
+  if ((epage ==='all')&&(flag == 0)){
+    butterfly_swiper_injector_config();
+  }
+  else if (epage === cpage){
+    butterfly_swiper_injector_config();
+  }
+  </script><script defer src="https://npm.elemecdn.com/hexo-butterfly-swiper/lib/swiper.min.js"></script><script defer data-pjax src="https://npm.elemecdn.com/hexo-butterfly-swiper/lib/swiper_init.js"></script><div class="js-pjax"><script async="async">var arr = document.getElementsByClassName('recent-post-item');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__zoomIn');
+    arr[i].setAttribute('data-wow-duration', '2s');
+    arr[i].setAttribute('data-wow-delay', '1s');
+    arr[i].setAttribute('data-wow-offset', '100');
+    arr[i].setAttribute('data-wow-iteration', '1');
+  }</script><script async="async">var arr = document.getElementsByClassName('card-widget');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__fadeInBottomRight');
+    arr[i].setAttribute('data-wow-duration', '');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('pagination');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__zoomIn');
+    arr[i].setAttribute('data-wow-duration', '');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script></div><script defer src="https://npm.elemecdn.com/hexo-butterfly-wowjs/lib/wow.min.js"></script><script defer src="https://npm.elemecdn.com/hexo-butterfly-wowjs/lib/wow_init.js"></script><script async src="//at.alicdn.com/t/font_2032782_8d5kxvn09md.js"></script><script data-pjax src="https://npm.elemecdn.com/hexo-filter-gitcalendar/lib/gitcalendar.js"></script><script data-pjax>
+  function gitcalendar_injector_config(){
+      var parent_div_git = document.getElementById('gitZone');
+      var item_html = '<div class="recent-post-item" id="gitcalendarBar" style="width:100%;height:auto;padding:10px;"><style>#git_container{min-height: 280px}@media screen and (max-width:650px) {#git_container{min-height: 0px}}</style><div id="git_loading" style="width:10%;height:100%;margin:0 auto;display: block;"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 50 50" style="enable-background:new 0 0 50 50" xml:space="preserve"><path fill="#d0d0d0" d="M25.251,6.461c-10.318,0-18.683,8.365-18.683,18.683h4.068c0-8.071,6.543-14.615,14.615-14.615V6.461z" transform="rotate(275.098 25 25)"><animatetransform attributeType="xml" attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="0.6s" repeatCount="indefinite"></animatetransform></path></svg><style>#git_container{display: none;}</style></div><div id="git_container"></div></div>';
+      parent_div_git.insertAdjacentHTML("afterbegin",item_html)
+      console.log('已挂载gitcalendar')
+      }
+
+    if( document.getElementById('gitZone') && (location.pathname ==='/about/'|| '/about/' ==='all')){
+        gitcalendar_injector_config()
+        GitCalendarInit("https://gitcalendar.fomal.cc/api?Ginkgovio",['#d9e0df', '#c6e0dc', '#a8dcd4', '#9adcd2', '#89ded1', '#77e0d0', '#5fdecb', '#47dcc6', '#39dcc3', '#1fdabe', '#00dab9'],'Ginkgovio')
+    }
+  </script><!-- hexo injector body_end end --><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body></html>
